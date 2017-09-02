@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 2.1//EN" "http://struts.apache.org/dtds/struts-2.1.dtd">
+<struts>
+    <!-- true开发模式 -->
+	<constant name="struts.devMode" value="true" /> 
+	<!-- <constant name="struts.devMode" value="false" />-->
+	<constant name="struts.i18n.encoding" value="UTF-8" />
+	<constant name="struts.action.extension" value="jspx" />
+	<constant name="struts.objectFactory" value="spring" />
+	<constant name="struts.custom.i18n.resources" value="resource/ApplicationResources" />
+	<constant name="struts.multipart.maxSize" value="20971520" />
+	<constant name="struts.multipart.saveDir" value="temp" />
+	<constant name="struts.multipart.maxSize" value="30000000"></constant>
+	<package name="default" extends="json-default">
+		<interceptors>
+			<!-- login拦截器,jspx请求首先进入被拦截 -->
+			<interceptor name="myLogin"
+				class="com.bayan.keke.interceptor.LoginInterceptor" />
+			<!-- 密文拦截器 
+			<interceptor name="dataInterceptor"
+				class="com.bayan.keke.interceptor.DataInterceptor" />-->
+			<!-- 拦截器栈 -->
+			<interceptor-stack name="myInterceptor">
+				<!--<interceptor-ref name="defaultStack"/>-->
+				<interceptor-ref name="defaultStack">
+				    <!-- 调试用，打印错误信息-->
+				    <param name="exception.logEnabled">true</param>
+				    <param name="exception.logLevel">error</param>
+				</interceptor-ref>
+                <interceptor-ref name="myLogin" />
+                <!-- 
+                <interceptor-ref name="dataInterceptor" />
+                 -->
+			</interceptor-stack>
+		</interceptors>
+		<!-- 设置系统默认的拦截器 -->
+		<default-interceptor-ref name="myInterceptor" />
+		<!-- 全局跳转 -->
+		<global-results>
+			<result name="error">/error.jsp</result>
+			<result name="reLogin">/remsg.jsp</result>
+			<result name="login">/login.jsp</result>
+			<result name="adminLogin">/adminLogin.jsp</result>
+			<result name="orgLogin">/orgLogin.jsp</result>
+		</global-results>
+		<action name="*User" class="com.bayan.keke.action.UserAction"
+			method="{1}">
+			<!-- 
+			<result name="register">register.jsp</result>
+			<result name="success">index.jsp</result>
+			<result name="index">index.jsp</result>
+			<result name="login">login.jsp</result>
+			<result name="stat">/WEB-INF/jsp/statistics.jsp</result>
+			<result name="wallet">/WEB-INF/jsp/wallet.jsp</result>
+			<result name="integral">/WEB-INF/jsp/integral.jsp</result>
+			<result name="admin">admin.jsp</result>
+			<result name="tongji">/WEB-INF/jsp/tongji.jsp</result>
+			<result name="day">/WEB-INF/jsp/dataadd.jsp</result>
+			<result name="update">/WEB-INF/jsp/update.jsp</result>
+			 -->
+		</action>
+		<action name="*Subject" class="com.bayan.keke.action.SubjectAction"
+			method="{1}">
+			<!-- 
+			<result name="success">index.jsp</result>
+			<result name="work">/WEB-INF/jsp/work.jsp</result>
+			<result name="task">/WEB-INF/jsp/task.jsp</result>
+			<result name="blurry">/blurry.jsp</result>
+			 -->
+		</action>
+		<action name="*Feedback" class="com.bayan.keke.action.FeedbackAction"
+			method="{1}">
+			<result name="feedback">/WEB-INF/jsp/admin/feedback.jsp</result>
+		</action>
+		<action name="*Pay" class="com.bayan.keke.action.PayAction"
+			method="{1}">
+			<result name="success">index.jsp</result>
+		</action>
+		<action name="*Point" class="com.bayan.keke.action.PointAction"
+		    method="{1}">
+		</action>
+		<action name="*TeaSub" class="com.bayan.keke.action.TeaSubAction"
+		    method="{1}">
+		</action>
+        <action name="*TeaUs" class="com.bayan.keke.action.TeaUsAction"
+            method="{1}">
+        </action>
+		<action name="*Manage" class="com.bayan.keke.action.ManageAction"
+		    method="{1}">
+		    <result name="index">/WEB-INF/jsp/index.jsp</result>
+		    <result name="admin">/WEB-INF/jsp/admin/admin.jsp</result>
+		    <result name="batchTrans">/WEB-INF/jsp/admin/batchTrans.jsp</result>
+		    <result name="batchTransTg">/WEB-INF/jsp/admin/batchTransTg.jsp</result>
+		    <result name="certification">/WEB-INF/jsp/admin/certification.jsp</result>
+		    <result name="report">/WEB-INF/jsp/admin/report.jsp</result>
+		    <result name="alipay">/WEB-INF/jsp/admin/alipay.jsp</result>
+		    <result name="tongji">/WEB-INF/jsp/admin/tongji.jsp</result>
+		    <result name="dataadd">/WEB-INF/jsp/admin/dataadd.jsp</result>
+		    <result name="fidsid">/WEB-INF/jsp/admin/fidsid.jsp</result>
+		    <result name="wish">/WEB-INF/jsp/admin/wish.jsp</result>
+		    <result name="profit">/WEB-INF/jsp/admin/profit.jsp</result>
+		    <result name="addOil">/WEB-INF/jsp/admin/addOil.jsp</result>
+		    <result name="photo">/WEB-INF/jsp/admin/photo.jsp</result>
+		    <result name="messagePage">/WEB-INF/jsp/message.jsp</result>
+		    <result name="teaTongji">/WEB-INF/jsp/teaTongji.jsp</result>
+		    <result name="teaWithdraw">/WEB-INF/jsp/teaWithdraw.jsp</result>
+		    <result name="tixian">/WEB-INF/jsp/tixian.jsp</result>
+		    <result name="accountInfo">/WEB-INF/jsp/accountInfo.jsp</result>
+		    <result name="tixianOk">/WEB-INF/jsp/tixianOk.jsp</result>
+		    <result name="sidUserList">/WEB-INF/jsp/sidUserInfo.jsp</result>
+		</action>
+		<action name="*Version" class="com.bayan.keke.action.VersionAction"
+            method="{1}">
+        </action>
+        <action name="*Sales" class="com.bayan.keke.action.SalesAction"
+            method="{1}">
+            <result name="register">/WEB-INF/jsp/register.jsp</result>
+            <result name="upd">/WEB-INF/jsp/upd.jsp</result>
+            <result name="index">/WEB-INF/jsp/index.jsp</result>
+            <result name="inupdate">/WEB-INF/jsp/inupdate.jsp</result>
+            <result name="update">/WEB-INF/jsp/update.jsp</result>
+            <result name="feedback">/WEB-INF/jsp/admin/feedback.jsp</result>
+        </action>
+        <action name="*Netease" class="com.bayan.keke.action.NeteaseAction"
+            method="{1}">
+        </action>
+        <action name="*Org" class="com.bayan.keke.org.action.OrgAction"
+            method="{1}">
+		    <result name="toAddStudent">/WEB-INF/jsp/org/addStudent.jsp</result>
+		    <result name="toAddTeacher">/WEB-INF/jsp/org/addTeacher.jsp</result>
+		    <result name="toStudentList">/WEB-INF/jsp/org/studentList.jsp</result>
+		    <result name="toTeaList">/WEB-INF/jsp/org/teacherList.jsp</result>
+		    <result name="orgIndex">/WEB-INF/jsp/org/orgIndex.jsp</result>
+		    <result name="toUpdPwd">/WEB-INF/jsp/org/updOrgPw.jsp</result>
+		    <result name="updatePwd">/WEB-INF/jsp/org/updatePwd.jsp</result>
+		    <result name="toAddJigou">/WEB-INF/jsp/org/addOrgInfo.jsp</result>
+		    <result name="toJigouList">/WEB-INF/jsp/org/orgList.jsp</result>
+		    <result name="toUploadVieo">WEB-INF/jsp/uploadQiniu.jsp</result>
+        </action>
+        <action name="*Report" class="com.bayan.keke.action.ReportAction"
+            method="{1}">
+        </action>
+        <action name="*Activity" class="com.bayan.keke.action.ActivityAction"
+            method="{1}">
+        </action>
+		<action name="*Html" class="com.bayan.keke.html.action.HtmlAction"
+				method="{1}">
+		</action>
+		<action name="*Videos" class="com.bayan.keke.action.VideosAction"
+				method="{1}">
+		</action>
+	</package>
+</struts>
+

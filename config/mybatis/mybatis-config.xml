@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" 
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <typeAliases>
+        <typeAlias alias="daily" type="com.bayan.keke.vo.KeDaily" />
+        <typeAlias alias="weekInfo" type="com.bayan.keke.vo.KeWeekInfo" />
+        <typeAlias alias="historyInfo" type="com.bayan.keke.vo.KeHistoryInfo" />
+        <typeAlias alias="user" type="com.bayan.keke.vo.KeUser" />
+        <typeAlias alias="subject" type="com.bayan.keke.vo.KeSubject" />
+        <typeAlias alias="feedback" type="com.bayan.keke.vo.KeFeedback" />
+        <typeAlias alias="pay" type="com.bayan.keke.vo.KePay" />
+        <typeAlias alias="point" type="com.bayan.keke.vo.KePoint" />
+        <typeAlias alias="teaus" type="com.bayan.keke.vo.KeTeaUs" />
+        <typeAlias alias="taskVo" type="com.bayan.keke.vo.TaskVo" />
+        <typeAlias alias="teaSub" type="com.bayan.keke.vo.KeTeaSub" />
+        <typeAlias alias="markDb" type="com.bayan.keke.vo.KeMarkDb" />
+        <typeAlias alias="teaIncomeRcd" type="com.bayan.keke.vo.KeTeaIncomeRcd" />
+        <typeAlias alias="teaIncome" type="com.bayan.keke.vo.KeTeaIncome" />
+        <typeAlias alias="manage" type="com.bayan.keke.vo.KeManage" />
+        <typeAlias alias="teaOutputRcd" type="com.bayan.keke.vo.KeTeaOutputRcd" />
+        <typeAlias alias="ver" type="com.bayan.keke.vo.KeVersion" />
+        <typeAlias alias="sal" type="com.bayan.keke.vo.KeSales" />
+        <typeAlias alias="netease" type="com.bayan.keke.vo.KeNetease" />
+        <typeAlias alias="org" type="com.bayan.keke.vo.KeOrg" />
+        <typeAlias alias="rep" type="com.bayan.keke.vo.KeReport" />
+        <typeAlias alias="activity" type="com.bayan.keke.vo.KeActivity" />
+        <typeAlias alias="html" type="com.bayan.keke.vo.KeHtml" />
+        <typeAlias alias="videos" type="com.bayan.keke.vo.KeVideos" />
+    </typeAliases>
+    <mappers>
+        <mapper resource="com/bayan/keke/sqlmap/User.xml" />
+        <mapper resource="com/bayan/keke/sqlmap/Subject.xml" />
+        <mapper resource="com/bayan/keke/sqlmap/Feedback.xml" />
+        <mapper resource="com/bayan/keke/sqlmap/Pay.xml" />
+        <mapper resource="com/bayan/keke/sqlmap/Point.xml" />
+        <mapper resource="com/bayan/keke/sqlmap/TeaUs.xml" />
+        <mapper resource="com/bayan/keke/sqlmap/TeaSub.xml" />
+        <mapper resource="com/bayan/keke/sqlmap/Manage.xml" />
+        <mapper resource="com/bayan/keke/sqlmap/Version.xml" />
+        <mapper resource="com/bayan/keke/sqlmap/Sales.xml" />
+        <mapper resource="com/bayan/keke/sqlmap/Netease.xml" />
+        <mapper resource="com/bayan/keke/sqlmap/common.xml" />
+        <mapper resource="com/bayan/keke/sqlmap/org.xml" />
+        <mapper resource="com/bayan/keke/sqlmap/Report.xml" />
+        <mapper resource="com/bayan/keke/sqlmap/Activity.xml" />
+        <mapper resource="com/bayan/keke/sqlmap/Html.xml" />
+        <mapper resource="com/bayan/keke/sqlmap/Videos.xml" />
+    </mappers>
+</configuration>
