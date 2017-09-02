@@ -1,0 +1,53 @@
+@CHARSET "utf-8";
+#right {
+    background-color: #2bae2a;
+    border: 1px solid #cccccc;
+    border-radius: 20px;
+    cursor: pointer;
+    height: 25%;
+    line-height: 100%;
+    margin-left: 3%;
+    margin-top: 7%;
+    vertical-align: middle;
+    width: 90%;
+    z-index: 101;
+}
+#wrong {
+    background-color: #ff7143;
+    border: 1px solid #cccccc;
+    border-radius: 20px;
+    cursor: pointer;
+    height: 25%;
+    line-height: 100%;
+    margin-left: 2%;
+    margin-top: 2%;
+    vertical-align: middle;
+    width: 90%;
+    z-index: 101;
+}
+#keyPoint {
+    background-color: #28b6f6;
+    border: 1px solid #cccccc;
+    border-radius: 20px;
+    cursor: pointer;
+    height: 25%;
+    line-height: 100%;
+    margin-left: 3%;
+    margin-top: 2%;
+    vertical-align: middle;
+    width: 90%;
+    z-index: 101;
+}
+#kbq {
+    background-color: #666666;
+    border: 1px solid #cccccc;
+    border-radius: 20px;
+    cursor: pointer;
+    height: 25%;
+    line-height: 100%;
+    margin-left: 3%;
+    margin-top: 2%;
+    vertical-align: middle;
+    width: 90%;
+    z-index: 101;
+}
