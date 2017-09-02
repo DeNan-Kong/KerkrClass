@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="common">
+
+	<!-- 判断上次验证码发送时间  -->
+	<select id="selVerifyCode" resultType="string" parameterType="map">
+		SELECT TIMESTAMPDIFF(SECOND, MAX(create_time), NOW())
+		 FROM ke_smslog WHERE phone_number=#{phoneNumber}
+	</select>
+	
+</mapper>

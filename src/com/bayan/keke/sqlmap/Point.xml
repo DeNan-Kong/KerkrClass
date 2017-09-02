@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 学分 -->
+<mapper namespace="point">
+	<!-- 检查剩余学分 -->
+	<select id="view" resultType="string" parameterType="point">
+		SELECT point_all as pointCount FROM ke_point WHERE user_id=#{userId}
+	</select>
+	
+	<!-- 更新心愿单 -->
+	<update id="wish" parameterType="point">
+		update ke_point
+		set comment=#{wishContent},
+			update_time=now()
+		where user_id=#{userId}
+	</update>
+</mapper>

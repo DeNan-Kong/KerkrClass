@@ -52,19 +52,30 @@ public class VideosAction extends BaseAction implements
 
     /**
      * 上传视频token，发布正式版需要更换QINIU_BUCKET
-     *
+     * clientUpload
      * @return 返回上传token
      */
     public void getToken() {
-        String token = "error";
+        //跨域
+        getResponse().setHeader("Access-Control-Allow-Origin","*");
         if (!CheckUtil.isNullOrEmpty(
                 getSession().getAttribute("userId"))
                 ) {
             auth = Auth.create(KeCommon.ACCESS_KEY, KeCommon.SECRET_KEY);
-
-            token = auth.uploadToken(KeCommon.QINIU_VIDEO_BUCKET);
+            StringMap putPolicy = new StringMap();
+            putPolicy.put("callbackUrl", "http://ovhr8lih9.bkt.clouddn.com/callback");
+            putPolicy.put("callbackBody", "{\"key\":\"$(key)\",\"hash\":\"$(etag)\",\"bucket\":\"$(bucket)\",\"fsize\":$(fsize)}");
+            putPolicy.put("callbackBodyType", "application/json");
+            long expireSeconds = 3600;
+            //String upToken = auth.uploadToken(KeCommon.QINIU_VIDEO_BUCKET, null, expireSeconds, putPolicy);
+            String upToken = auth.uploadToken(KeCommon.QINIU_VIDEO_BUCKET);
+            print("{\"uptoken\":\""+ upToken +"\"}");
         }
-        print(token);
+
+    }
+
+    public void uploadCallBack(){
+
     }
 
     public void getInfo() {
@@ -89,16 +100,16 @@ public class VideosAction extends BaseAction implements
         }
     }
 
-    public void upload() {
+    public void serverUpload() {
         //构造一个带指定Zone对象的配置类
         Configuration cfg = new Configuration(Zone.zone0());
-
-        Auth auth = Auth.create(KeCommon.ACCESS_KEY, KeCommon.SECRET_KEY);
-        String upToken = auth.uploadToken(KeCommon.QINIU_VIDEO_BUCKET);
+        /*Auth auth = Auth.create(KeCommon.ACCESS_KEY, KeCommon.SECRET_KEY);
+        String upToken = auth.uploadToken(KeCommon.QINIU_VIDEO_BUCKET);*/
+        String upToken = getUpToken();
         //本地断点路径
         String localFilePath = "C:\\compositions\\12.jpg";
         //默认不指定key的情况下，以文件内容的hash值作为文件名
-        String key = null;
+        String key = "server-upload";
 
         String localTempDir = Paths.get(System.getenv("java.io.tmpdir"), KeCommon.QINIU_VIDEO_BUCKET).toString();
         try {
@@ -130,16 +141,13 @@ public class VideosAction extends BaseAction implements
 
     }
 
-    public void upload2() {
+    public void serverUpload2() {
         //构造一个带指定Zone对象的配置类
         Configuration cfg = new Configuration(Zone.zone0());
         //...其他参数参考类注释
         UploadManager uploadManager = new UploadManager(cfg);
         //...生成上传凭证，然后准备上传
-        String accessKey = "your access key";
-        String secretKey = "your secret key";
-        String bucket = "your bucket name";
-        //如果是Windows情况下，格式是 D:\\qiniu\\test.png
+
         String localFilePath = "C:\\compositions\\12.jpg";
         //默认不指定key的情况下，以文件内容的hash值作为文件名
         String key = null;
@@ -174,9 +182,4 @@ public class VideosAction extends BaseAction implements
         return upToken;
     }
 
-    public static void main(String[] arg) {
-
-        VideosAction videosAction = new VideosAction();
-        videosAction.upload();
-    }
 }

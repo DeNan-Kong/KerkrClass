@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 查询用户是否注册云信id,处理白板讲解疑难业务-->
+<mapper namespace="netease">
+	<!-- 判断家长是否已注册云信ID -->
+	<select id="stuRegister" resultType="map" parameterType="netease">
+		SELECT * FROM ke_stu_yunxin WHERE user_id = #{userId}
+	</select>
+	
+	<!-- 判断老师是否已注册云信ID -->
+	<select id="teaRegister" resultType="map" parameterType="netease">
+		SELECT * FROM ke_tea_yunxin WHERE teacher_id = #{teacherId}
+	</select>
+	
+	<!-- 注册用户和云信相关信息 -->
+	<insert id="insertStuYunxin" parameterType="netease" useGeneratedKeys="true"
+		keyProperty="id">
+		INSERT INTO ke_stu_yunxin
+			(user_id,yunxin_id,yunxin_token,status,create_time)
+		VALUES
+			(#{userId},#{yunxinId},#{yunxinToken},'0',now())
+	</insert>
+	
+	<!-- 注册用户和云信相关信息 -->
+	<insert id="insertTeaYunxin" parameterType="netease" useGeneratedKeys="true"
+		keyProperty="id">
+		INSERT INTO ke_tea_yunxin
+			(teacher_id,yunxin_id,yunxin_token,status,create_time)
+		VALUES
+			(#{teacherId},#{yunxinId},#{yunxinToken},'0',now())
+	</insert>
+	
+	<!-- 查询正在通话人数 -->
+	<select id="callingCnt" resultType="string">
+		SELECT COUNT(*) FROM ke_tea_yunxin WHERE status = '1'
+	</select>
+	
+	<!-- 生成云信通话记录 -->
+	<insert id="insertCallYunxin" parameterType="netease" useGeneratedKeys="true"
+		keyProperty="id">
+		INSERT INTO ke_yunxincall_record
+			(user_id,teacher_id,start_time,end_time,time_cost,oil_cost,record_id,create_time)
+		VALUES
+			(#{userId},#{teacherId},now(),now(),'0','0',#{recordId},now())
+	</insert>
+	
+	<!-- 生成云信消息推送记录 -->
+	<insert id="insertMSGYunxin" parameterType="netease" useGeneratedKeys="true"
+		keyProperty="id">
+		INSERT INTO ke_yunxinmsg_record
+			(record_id,user_id,teacher_id,toTea_time,sendFlag_stu,sendFlag_tea,hang_up,create_time)
+		VALUES
+			(#{recordId},#{userId},#{teacherId},now(),#{sendFlagStu},#{sendFlagTea},#{hangUp},now())
+	</insert>
+	
+	<!-- 查询家长端用户的类型对应的设备号 -->
+	<select id="selectStuDevice" resultType="string" parameterType="netease">
+		SELECT a.device_id as deviceId FROM ke_device a 
+		LEFT JOIN ke_user b 
+		ON a.user_id=b.user_id 
+		WHERE b.user_id = #{userId} AND a.flag = '0'
+	</select>
+	
+	<!-- 查询老师端用户的类型对应的设备号 -->
+	<select id="selectTeaDevice" resultType="string" parameterType="netease">
+		SELECT a.device_id as deviceId FROM ke_device a 
+		LEFT JOIN ke_teacher b 
+		ON a.user_id=b.teacher_id
+		WHERE b.teacher_id = #{teacherId} AND a.flag = '1'
+	</select>
+	
+	<!-- 更新学生答疑的状态为"接听中" -->
+	<update id="upStuStatusYX" parameterType="netease">
+		UPDATE ke_stu_yunxin a
+		SET a.status=#{serviceStatus},a.update_time=now()
+		WHERE a.user_id=#{userId}
+	</update>
+	
+	<!-- 更新老师答疑的状态为"接听中" -->
+	<update id="upTeaStatusYX" parameterType="netease">
+		UPDATE ke_tea_yunxin b
+		SET b.status=#{serviceStatus},b.update_time=NOW()
+		WHERE b.teacher_id=#{teacherId}
+	</update>
+	
+	<!-- 取得通话记录信息 -->
+	<select id="getRecordInfo" resultType="map" parameterType="netease">
+		SELECT * FROM ke_yunxincall_record WHERE record_id = #{recordId}
+	</select>
+	
+	<!-- 答疑结束后,给老师加答疑服务费-->
+    <update id="upAnswerPay" parameterType="netease">
+		UPDATE ke_tea_income
+		SET total_income=total_income + #{answerPay},
+			input_income=input_income + #{answerPay},
+			update_time=now()
+		WHERE teacher_id=#{teacherId}
+    </update>
+    
+    <!-- 更新答疑结果信息-->
+    <update id="upAnswerInfo" parameterType="netease">
+		UPDATE ke_yunxincall_record
+		SET end_time=#{endTime},
+			time_cost=#{costTime},
+			oil_cost=#{costOil},
+			update_time=NOW()
+		WHERE teacher_id=#{teacherId} 
+		AND user_id=#{userId}
+    </update>
+	
+	<!-- 更新学生对答疑老师的评价-->
+    <update id="upAnswerComment" parameterType="netease">
+		UPDATE ke_yunxincall_record 
+		SET comment=#{comment}
+		WHERE record_id=#{recordId}
+    </update>
+	
+	<!-- 取得超时未接通推送消息记录的提出答疑申请的学生 -->
+	<select id="getMSGRecordInfo" resultType="netease" parameterType="netease">
+		SELECT user_id AS userId,toTea_time as toTeaTime FROM ke_yunxinmsg_record a 
+		WHERE a.teacher_id=#{teacherId} 
+		AND a.hang_up='0'
+		AND a.sendFlag_stu='0'
+	</select>
+	
+	<!-- 更新学生的消息推送的状态为1：已推送 -->
+	<update id="upStuMSGStatusYX" parameterType="netease">
+		UPDATE ke_yunxinmsg_record a
+		SET a.sendFlag_stu='1',
+			a.toStu_time=now()
+		WHERE a.user_id=#{userId} 
+		AND a.hang_up='0'
+		AND a.sendFlag_stu='0'
+	</update>
+	
+	<!-- 更新老师消息推送的状态为1：已推送 -->
+	<!-- <update id="upTeaMSGStatusYX" parameterType="netease">
+		UPDATE ke_yunxinmsg_record a
+		SET a.sendFlag_stu='1'
+		WHERE a.teacher_id=#{teacherId} 
+		AND a.hang_up='0'
+		AND a.sendFlag_stu='0'
+	</update> -->
+	
+</mapper>

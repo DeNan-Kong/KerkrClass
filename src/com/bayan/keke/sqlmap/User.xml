@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="user">
+	<!-- 学生注册 -->
+	<insert id="insert" parameterType="user" useGeneratedKeys="true"
+		keyProperty="id">
+		insert into ke_user 
+			(user_id,user_name,phone_number,password,head_url,
+			grade,city_code,province_code,user_level,type,org_id,create_time) 
+		VALUE 
+			(#{phoneNumber},#{nickName},#{phoneNumber},#{password},
+			#{headUrl},#{grade},#{cityCode},#{provinceCode},#{stuLevel},#{type},#{orgId},NOW());
+		INSERT INTO ke_point
+			(user_id,point_all,create_time)
+		VALUES
+			(#{phoneNumber},'0',NOW());
+	</insert>
+	
+	<!-- 验证码添加 -->
+	<insert id="insertCode" parameterType="user" useGeneratedKeys="true"
+		keyProperty="id">
+		insert into ke_smslog
+		(phone_number,verify_code,create_time) 
+		values (#{phoneNumber},#{verifyCode},now())
+		ON DUPLICATE KEY UPDATE
+		verify_code=#{verifyCode},create_time=now()
+	</insert>
+	
+	<!-- 取得验证码信息  -->
+	<select id="queryBySms" resultType="user" parameterType="user">
+		select * from ke_smslog 
+		where phone_number=#{phoneNumber} and verify_code=#{verifyCode}
+	</select>
+	
+	<!-- 取得设备iID -->
+	<select id="getDevices" resultType="string" parameterType="user">
+		SELECT a.device_id 
+		FROM ke_device a 
+		LEFT JOIN ke_user b 
+		ON a.user_id=b.user_id 
+		WHERE b.user_id = #{userId}
+		AND a.flag = #{flag}
+	</select>
+	
+	<!-- 添加设备信息  -->
+	<insert id="insertDevice" parameterType="user" useGeneratedKeys="true"
+		keyProperty="id">
+		insert into ke_device
+		(device_id,user_id,system_type,flag,create_time)
+		values
+		(#{deviceId},#{userId},#{deviceType},'0',now())
+		ON DUPLICATE KEY UPDATE
+		create_time=now()
+	</insert>
+	
+	<!-- 修改设备ID -->
+	<update id="updateDevice" parameterType="user">
+		update ke_device
+		set device_id=#{deviceId},system_type=#{deviceType},create_time=now()
+		where user_id=#{userId}
+		  AND flag=#{flag}
+	</update>
+	
+	<!-- 学生登录  -->
+    <select id="loginStu" resultType="map" parameterType="user">
+		SELECT id as id,
+			user_id as userId,
+			user_name as userName,
+			grade as grade,
+			head_url as headUrl,
+			city_code as cityCode,
+			province_code as provinceCode
+		FROM ke_user 
+		WHERE 
+			user_id=#{phoneNumber} 
+		AND password=#{password}
+	</select>
+	
+	<!-- 判断是否已注册  -->
+	<select id="register" resultType="map" parameterType="user">
+		select * from ke_user where user_id=#{phoneNumber}
+	</select>
+	
+	<!-- 根据手机号查找用户  -->
+	<select id="selUserWithPhoneNum" resultType="map" parameterType="user">
+		select * from ke_user where phone_number=#{phoneNumber}
+	</select>
+	
+	<!-- 忘记密码，重置 -->
+	<update id="pwReset" parameterType="user">
+		update ke_user
+		set password=#{password},update_time=now()
+		where user_id=#{phoneNumber}
+	</update>
+	
+	<!-- 学生头像修改  -->	
+	<update id="headUpdate" parameterType="user">
+		update ke_user
+		set head_url=#{headUrl},update_time=now()
+		where user_id=#{userId}
+	</update>
+	
+	<!-- 学生昵称修改  -->	
+	<update id="updateName" parameterType="user">
+		update ke_user
+		set user_name=#{nickName},update_time=now()
+		where user_id=#{userId}
+	</update>
+	
+	<!-- 学生年级修改  -->	
+	<update id="updateGrade" parameterType="user">
+		update ke_user
+		set grade=#{grade},update_time=now()
+		where user_id=#{userId}
+	</update>
+	
+	<!-- 学生所在地修改  -->	
+	<update id="updateCity" parameterType="user">
+		update ke_user
+		set city_code=#{cityCode},
+			province_code=#{provinceCode},
+			update_time=now()
+		where user_id=#{userId}
+	</update>
+	
+	<!-- 判断第三方是否已注册 -->
+	<select id="qqWechatRegister" resultType="map" parameterType="user">
+		SELECT * FROM ke_user WHERE user_id=#{userId}
+	</select>
+	
+	<!-- 第三方登录插入数据 -->
+	<insert id="insertQQWechat" parameterType="user" useGeneratedKeys="true"
+		keyProperty="id">
+		INSERT INTO ke_user
+		(user_id,user_name,head_url,grade,city_code,province_code,user_level,type,create_time) 
+		VALUES 
+		(#{userId},#{nickName},#{headUrl},#{grade},#{cityCode},#{provinceCode},#{stuLevel},#{type},NOW());
+		INSERT INTO ke_point
+		(user_id,point_all,create_time)
+		VALUES
+		(#{userId},'0',NOW());
+	</insert>
+	
+	<!-- 第三方登录 -->
+	<select id="qqWeChatLogin" resultType="map" parameterType="user">
+		SELECT id as id,
+			user_id as userId,
+			user_name as userName,
+			grade as grade,
+			head_url as headUrl,
+			city_code as cityCode,
+			province_code  as provinceCode
+		FROM ke_user
+		WHERE 
+			user_id=#{userId}
+	</select>
+</mapper>

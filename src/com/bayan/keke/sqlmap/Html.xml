@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="html">
+
+	
+	<!-- 查找图片  -->
+	<select id="selPhotoInfo" resultType="map" parameterType="html">
+		SELECT user_id,subject_type,DATE_FORMAT(share_time,'%Y-%m-%d') AS share_time FROM ke_html WHERE share_id=#{shareId}
+	</select>
+
+</mapper>

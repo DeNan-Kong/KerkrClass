@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 举报 -->
+<mapper namespace="rep">
+	<!-- 插入一条举报的记录 -->
+	<insert id="insert" parameterType="rep" useGeneratedKeys="true"
+		keyProperty="id">
+		INSERT INTO ke_report 
+			(photo_id,user_id,teacher_id,content_stu,result,tousu_time,STATUS)
+		VALUE
+			(#{photoId},#{userId},#{teacherId},#{comment},'0',now(),'0')
+	</insert>	
+	
+	<!-- 查找task表里对应被举报老师的信息 -->
+	<select id="selTea" resultType="map" parameterType="rep">
+		SELECT * FROM ke_task WHERE user_id=#{userId} AND photo_id=#{photoId}
+	</select>
+	
+	<!-- 更新作业task表里的作业状态 -->
+	<update id="upStatus" parameterType="rep">
+		UPDATE ke_task
+		SET task_status='INVALID',
+			delete_flag='3',
+			update_time=now()
+		WHERE user_id=#{userId}
+		AND teacher_id=#{teacherId}
+		AND photo_id=#{photoId}
+	</update>
+	
+	<!-- 查找report表里对应被举报老师的信息 -->
+	<select id="selReport" resultType="string" parameterType="rep">
+		SELECT COUNT(*) FROM ke_report WHERE photo_id=#{photoId}
+	</select>
+</mapper>

@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 用户剩余油量信息 -->
+<mapper namespace="pay">
+	<!-- 插入油量 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="pay">
+		insert into	ke_pay
+		(user_id,count_oil,create_time)
+		values
+		(#{userId},#{inputOil},now())
+	</insert>
+	
+	<!-- 检查剩余油量 -->
+	<select id="remainCnt" resultType="string" parameterType="pay">
+		select count_oil from ke_pay where user_id=#{userId}
+	</select>
+	
+	<!-- 更新充值后的油量 -->
+	<update id="update" parameterType="pay">
+		UPDATE ke_pay
+		set	count_oil=#{remainOil},update_time = NOW()
+		where user_id=#{userId}	
+	</update>
+	
+	<!-- 查询充值后的油量 -->
+	<select id="count" resultType="string" parameterType="pay">
+		SELECT oil_remain FROM ke_pay_record 
+		WHERE user_id=#{userId} 
+		ORDER BY create_time DESC,id DESC LIMIT 1
+	</select>
+	
+	<!-- 检查用户是否有过充值 -->
+	<select id="register" resultType="map" parameterType="pay">
+		select * from ke_pay where user_id=#{userId}
+	</select>
+	
+	<!-- 检查油量是否已经用完 -->
+	<select id="shelf" resultType="string">
+		SELECT a.id AS id FROM ke_pay AS a
+		INNER JOIN ke_task AS b
+		ON a.user_id=b.user_id AND a.count_oil <![CDATA[>]]> 0
+		GROUP BY b.user_id
+	</select>
+	
+	<!-- 更新油量，每天减去1L -->
+	<update id="updateShelf">
+		update ke_pay 
+		set count_oil=count_oil-1,update_time=now()
+		where count_oil <![CDATA[>]]> 0
+		AND user_id IN (SELECT user_id FROM ke_task GROUP BY user_id)
+	</update>
+	
+	<!-- 插入支付记录 -->
+	<insert id="record" useGeneratedKeys="true" keyProperty="id" parameterType="pay">
+		INSERT INTO ke_pay_record
+		(user_id,pay_type,oil_input,oil_remain,pay_money,order_number,key_code,discount_amount,comment,create_time)
+		VALUE
+		(#{userId},#{payType},#{inputOil},#{remainOil},#{payMoney},#{orderNumber},#{SIDCode},#{discMoney},#{comment},NOW())
+	</insert>
+	
+	<!-- 学生端查询充值记录 -->
+	<select id="selcetRecord" resultType="pay" parameterType="pay">
+		SELECT pay_type as payType,oil_input as inputOil,oil_remain as remainOil,
+			   pay_money as payMoney,create_time as createTime
+		FROM ke_pay_record
+		WHERE user_id=#{userId}
+		ORDER BY
+		DATE_FORMAT(create_time,'%Y-%m-%d') DESC
+	</select>
+	
+	<!-- 查询支付宝订单是否处理-->
+    <select id="selorderNum" resultType="int" parameterType="pay">
+        SELECT count(id) FROM ke_pay_record
+        WHERE order_number = #{orderNumber}
+    </select>
+    
+	<!-- 老师端收益记录 -->
+	<select id="getRecord" resultType="teaOutputRcd" parameterType="pay">
+		SELECT amount AS amount,type AS type,create_time AS createTime
+		FROM ke_tea_income_record
+		WHERE teacher_id=#{teacherId}
+		AND (result <![CDATA[<>]]> 'F' OR result IS NULL)
+		ORDER BY create_time DESC
+	</select>
+	
+	<!-- 检查是否有订单号存在 -->
+	<select id="selectOrder" resultType="string" parameterType="pay">
+		SELECT order_number AS orderNumber FROM ke_pay_record
+		WHERE order_number = #{orderNumber}
+	</select>
+	
+	<!-- 更新用户类型(0:试用用户,1:充值用户) -->
+	<update id="upType" parameterType="pay">
+		UPDATE ke_user
+		SET	TYPE='1',update_time = NOW()
+		where user_id=#{userId}	
+	</update>
+	
+    <!-- 更改油量 -->
+    <update id="changeOil" parameterType="map">
+        UPDATE ke_pay
+        SET 
+        <if test="addFlg != null and addFlg == '1'.toString()">
+            count_oil=count_oil + #{changeOil},
+        </if>
+        <if test="addFlg != null and addFlg == '0'.toString()">
+            count_oil=count_oil - #{changeOil},
+        </if>
+        update_time = NOW()
+        WHERE user_id=#{userId} 
+    </update>
+
+    <!-- 根据图片ID获取图片信息 -->
+    <select id="getTaskInfo" parameterType="map" resultType="map">
+        SELECT 
+            user_id,
+            teacher_id,
+            photo_id
+        FROM 
+            ke_task
+        WHERE 
+            photo_id=#{photoId}
+    </select>
+    
+</mapper>

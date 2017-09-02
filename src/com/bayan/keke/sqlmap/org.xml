@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org">
+
+    <!-- 添加机构信息-->
+    <insert id="insOrgInfo" parameterType="org">
+          <selectKey resultType="string" keyProperty="id">  
+               SELECT LAST_INSERT_ID()  
+          </selectKey> 
+        INSERT INTO ke_org_info(org_name,password,org_address,phone_num,create_time)
+        VALUES(#{orgName},#{password},#{orgAddress},#{orgPhoneNumber},NOW())
+    </insert>
+
+	<!-- 查询机构信息  -->
+	<select id="selOrgInfoWithId" resultType="map" parameterType="org">
+		SELECT * FROM ke_org_info WHERE org_id=#{orgId}
+	</select>
+	
+	<!-- 判断是否已注册  -->
+	<select id="selOrgInfo" resultType="map" parameterType="org">
+		SELECT * FROM ke_org_info WHERE phone_num=#{phoneNumber}
+	</select>
+    
+    <!-- 更新机构ID -->
+    <update id="updateOrgId" parameterType="org">
+           UPDATE ke_org_info
+           SET org_id=#{orgId}
+           WHERE id=#{id}
+    </update>
+    
+    <!-- 更新学生机构ID -->
+    <update id="updateStuInfo" parameterType="org">
+           UPDATE ke_user
+           SET org_id=#{orgId}
+           <if test="userName != null">
+           , user_name=#{userName}
+           </if>
+           <if test="grade != null">
+           , grade=#{grade}
+           </if>
+           <if test="password != null">
+           , password=#{password}
+           </if>
+           WHERE user_id=#{userId}
+    </update>
+    
+    <!-- 更新老师机构ID -->
+    <update id="updateTeaInfo" parameterType="org">
+           UPDATE ke_teacher
+           SET org_id=#{orgId}
+           <if test="teaName != null">
+           , teacher_name=#{teaName}
+           </if>
+           <if test="teaSubject != null">
+           , subject_id='02'
+           </if>
+           <if test="teaGrade != null">
+           , grade=#{teaGrade}
+           </if>
+           <if test="password != null">
+           , password=#{password}
+           </if>
+           WHERE teacher_id=#{teacherId}
+    </update>
+    
+    <!-- 忘记密码，重置 -->
+    <update id="reSetPwd" parameterType="org">
+        UPDATE ke_org_info
+        SET password=#{password},update_time=now()
+        WHERE phone_num=#{phoneNumber}
+    </update>
+    
+    <!-- 判断用户是否已经添加  -->
+    <select id="selOrgList" resultType="map">
+        SELECT org_id,
+        org_name,
+        org_address,
+        phone_num
+        FROM ke_org_info;
+    </select>
+    
+    <!-- 查询学生人数 -->
+    <select id="countStudent" parameterType="org" resultType="int">
+        SELECT count(1) FROM ke_user a
+        WHERE a.org_id=#{orgId}
+    </select>
+    <!-- 查询老师人数 -->
+    <select id="countTeacher" parameterType="org" resultType="int">
+        SELECT count(1) FROM ke_teacher a
+        WHERE a.org_id=#{orgId}
+    </select>
+    <!-- 查询学生明细 -->
+    <select id="selStuList" parameterType="org" resultType="map">
+        SELECT CONCAT('U',a.id) id,
+        a.user_id userId,
+        a.user_name name,
+        a.grade grade,
+        a.phone_number phoneNumber,
+        a.user_level stuLevel,
+        DATE_FORMAT(a.create_time, '%Y-%m-%d') createTime,
+        b.city_name cityName,
+        c.city_name provinceName,
+        a.type type,
+        '0' userType
+        FROM ke_user a
+        LEFT JOIN ke_city b
+        ON a.city_code=b.city_code
+        LEFT JOIN ke_city c
+        ON a.province_code=c.city_code
+        WHERE a.org_id=#{orgId}
+        <if test="grade != null and grade != ''">
+        AND a.grade=#{grade}
+        </if>
+        limit
+        #{page},#{size}
+    </select>
+    <!-- 查询老师明细-->
+    <select id="selTeaList" parameterType="org" resultType="map">
+        SELECT CONCAT('T',a.id) id,
+        a.teacher_id teacherId,
+        a.teacher_name name,
+        a.grade grade,
+        a.sex sex,
+        a.phone_number phoneNumber,
+        a.subject_id subjectId,
+        a.certificate_url certificateUrl,
+        DATE_FORMAT(a.create_time, '%Y-%m-%d') createTime,
+        b.city_name cityName,
+        c.city_name provinceName,
+        a.type type,
+        '1' userType,
+        apprv_status apprvStatus
+        FROM ke_teacher a
+        LEFT JOIN ke_city b
+        ON a.city_code=b.city_code
+        LEFT JOIN ke_city c
+        ON a.province_code=c.city_code
+        WHERE a.org_id=#{orgId}
+        limit
+        #{page},#{size}
+    </select>
+    
+    <!-- 变换学生年级 -->
+    <update id="reSetGrade" parameterType="map">
+        UPDATE ke_user
+		SET grade=#{gradetwo},update_time=NOW()
+		WHERE grade=#{gradeone}
+		AND org_id=#{orgId}
+    </update>
+</mapper>

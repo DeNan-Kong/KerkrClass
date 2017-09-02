@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="teaus">
+	<!-- 判断是否已注册  -->
+	<select id="teaRegister" resultType="map" parameterType="teaus">
+		SELECT * FROM ke_teacher WHERE teacher_id=#{phoneNumber}
+	</select>
+	
+	<!-- 用户注册 
+	<insert id="teaInsert" parameterType="teaus" useGeneratedKeys="true"
+		keyProperty="id">
+		INSERT INTO ke_teacher 
+		(teacher_id,teacher_name,sex,phone_number,password,grade,subject_id,head_url,
+		city_code,province_code,certificate_url,apprv_status,active_status,type,create_time) 
+		VALUE 
+		(#{phoneNumber},#{userName},#{sex},#{phoneNumber},#{password},#{grade},
+		#{subjectType},#{headUrl},#{cityCode},#{provinceCode},#{certificateUrl},
+		#{approveStatus},#{activeStatus},#{type},NOW());
+		INSERT INTO ke_tea_income 
+		(teacher_id,total_income,input_income,output_income,create_time)
+		VALUE
+		(#{phoneNumber},'0','0','0',NOW());
+		INSERT INTO ke_promote_income 
+			(teacher_id,total_income,input_income,output_income,create_time)
+		VALUE
+			(#{phoneNumber},'0','0','0',NOW())
+	</insert>
+	-->
+	<insert id="teaInsert" parameterType="teaus" useGeneratedKeys="true"
+        keyProperty="id">
+        INSERT INTO ke_teacher 
+        (teacher_id,teacher_name,sex,phone_number,password,grade,subject_id,head_url,
+        city_code,province_code,certificate_url,apprv_status,active_status,type,org_id,create_time) 
+        VALUE 
+        (#{phoneNumber},#{userName},#{sex},#{phoneNumber},#{password},#{grade},
+        '02',#{headUrl},#{cityCode},#{provinceCode},#{certificateUrl},
+        #{approveStatus},#{activeStatus},#{type},#{orgId},NOW());
+		INSERT INTO ke_tea_income 
+		(teacher_id,total_income,input_income,output_income,create_time)
+		VALUE
+		(#{phoneNumber},'0','0','0',NOW());
+		INSERT INTO ke_promote_income 
+			(teacher_id,total_income,input_income,output_income,create_time)
+		VALUE
+			(#{phoneNumber},'0','0','0',NOW())
+    </insert>
+    
+	<!-- 检查教师证审核状态 -->
+	<select id="teaStatus" resultType="string" parameterType="teaus">
+		SELECT apprv_status FROM ke_teacher WHERE teacher_id=#{teacherId}
+	</select>
+	
+	<!-- 取得设备号 -->
+	<select id="getDevices" resultType="string" parameterType="teaus">
+		SELECT a.device_id 
+		FROM ke_device a 
+		LEFT JOIN ke_teacher b 
+		ON a.user_id=b.teacher_id 
+		WHERE b.teacher_id = #{teacherId}
+		AND a.flag = #{flag}
+	</select>
+	
+	<!-- 添加设备  -->
+	<insert id="insertDevice" parameterType="teaus" useGeneratedKeys="true"
+		keyProperty="id">
+		insert into ke_device
+		(device_id,user_id,system_type,flag,create_time)
+		values
+		(#{deviceId},#{teacherId},#{deviceType},'1',now())
+		ON DUPLICATE KEY UPDATE
+		create_time=now()
+	</insert>
+	
+	<!-- 修改设备ID -->
+	<update id="updateDevice" parameterType="teaus">
+		update ke_device
+		set device_id=#{deviceId},system_type=#{deviceType},create_time=now()
+		where user_id=#{teacherId}
+		  AND flag = #{flag}
+	</update>
+	
+	<!-- 用户登录 -->
+	<select id="teaLogin" resultType="map" parameterType="teaus">
+		SELECT teacher_id AS teacherId,
+			teacher_name AS userName,
+			grade AS grade,
+			subject_id AS subjectType,
+			certificate_url AS certificateUrl,
+			city_code AS cityCode,
+			province_code AS provinceCode
+		FROM ke_teacher 
+		WHERE 
+			teacher_id=#{phoneNumber}
+		AND password=#{password}
+	</select>
+	
+	<!-- 更新老师在线离线状态 -->
+	<update id="upActive" parameterType="teaus">
+		update ke_teacher
+		set active_status=#{activeStatus},update_time=now()
+		where teacher_id=#{teacherId}
+	</update>
+	
+	<!-- 更新老师在线离线状态 -->
+	<update id="coerceUp" parameterType="teaus">
+		UPDATE ke_task
+		SET teacher_id=NULL,task_status='UNCORRECTED',update_time=NOW()
+		WHERE 
+			teacher_id=#{teacherId}
+		AND task_status='CORRECTING'
+	</update>
+	
+	<!-- 查看当前同时在线批改人数 -->
+	<select id="teaCount" resultType="string" parameterType="teaus">
+		SELECT COUNT(1) AS total FROM ke_teacher WHERE active_status='ONLINE' AND org_id=#{orgId}
+	</select>
+	
+	<!-- 查看当前未批改作业数 -->
+	<select id="taskCount" resultType="string" parameterType="teaus">
+		SELECT COUNT(DISTINCT(a.user_id)) AS total 
+		FROM ke_task a
+        INNER JOIN ke_user b
+        ON a.user_id=b.user_id
+        WHERE a.task_status = 'UNCORRECTED'
+        AND a.delete_flag = '0'
+        AND b.org_id = #{orgId}
+	</select>
+	
+	<!-- 验证码添加 -->
+	<insert id="insertCode" parameterType="teaus" useGeneratedKeys="true"
+		keyProperty="id">
+		insert into ke_smslog
+		(phone_number,verify_code,create_time) 
+		values (#{phoneNumber},#{verifyCode},now())
+		ON DUPLICATE KEY UPDATE
+		verify_code=#{verifyCode},create_time=now()
+	</insert>
+	
+	<!-- 忘记密码，重置 -->
+	<update id="pwReset" parameterType="teaus">
+		update ke_teacher
+		set password=#{password},update_time=now()
+		where teacher_id=#{phoneNumber}
+	</update>
+	
+	<!-- 用户头像修改  -->	
+	<update id="headUpdate" parameterType="teaus">
+		update ke_teacher
+		set head_url=#{headUrl},update_time=now()
+		where teacher_id=#{teacherId}
+	</update>
+	
+	<!-- 老师信息修改  -->	
+	<update id="upTeaInfo" parameterType="teaus">
+		UPDATE ke_teacher
+		SET teacher_name=#{userName},
+			grade=#{grade},
+			subject_id=#{subjectType},
+			city_code=#{cityCode},
+			province_code=#{provinceCode},
+			update_time=NOW()
+		WHERE teacher_id=#{teacherId}
+	</update>
+	
+	<!-- 查看前一天累计评分数 -->
+	<select id="scoreCount" resultType="string" parameterType="teaus">
+		SELECT COUNT(*) FROM ke_task 
+		WHERE teacher_id=#{teacherId}
+		AND POINT=#{score}
+		AND task_status = 'CORRECTED'
+		AND delete_flag <![CDATA[<>]]> '1'
+		AND DATE_FORMAT(update_time,'%Y-%m-%d') <![CDATA[<]]> DATE_FORMAT(NOW(),'%Y-%m-%d')
+	</select>
+	
+	<!-- 查看本月批改量 -->
+	<select id="thisMonthCnt" resultType="string" parameterType="teaus">
+		SELECT COUNT(*) FROM ke_task
+		WHERE teacher_id=#{teacherId}
+		AND task_status = 'CORRECTED'
+		AND delete_flag <![CDATA[<>]]> '1'
+		AND DATE_FORMAT(update_time,'%Y-%m-%d') BETWEEN #{firstDofM} AND DATE_FORMAT(NOW(),'%Y-%m-%d')
+	</select>
+	
+	<!-- 查看上月批改量 -->
+	<select id="lastMonthCnt" resultType="string" parameterType="teaus">
+		SELECT COUNT(*) FROM ke_task
+		WHERE teacher_id=#{teacherId}
+		AND task_status = 'CORRECTED'
+		AND delete_flag <![CDATA[<>]]> '1'
+		AND DATE_FORMAT(update_time,'%Y-%m-%d') BETWEEN #{firstDoflastM} AND #{lastDoflastM}
+	</select>
+	
+	<!-- 更新教师资格证key -->
+	<update id="updateCer" parameterType="teaus">
+		UPDATE ke_teacher 
+		SET certificate_url=#{certificateUrl},apprv_status=#{approveStatus},type='1'
+		WHERE teacher_id=#{teacherId}
+	</update>
+	
+	<!-- 查看老师批改过的学生信息 -->
+	<select id="getStuLst" resultType="map" parameterType="teaus">
+		SELECT a.user_id AS userId,b.user_name AS userName,b.head_url AS headUrl
+		FROM ke_task a
+		INNER JOIN ke_user b
+		ON a.user_id=b.user_id
+		WHERE a.teacher_id=#{teacherId}
+		GROUP BY a.user_id
+		ORDER BY a.create_time DESC
+	</select>
+</mapper>

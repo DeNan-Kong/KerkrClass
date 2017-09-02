@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="activity">
+
+    <!-- 判断是否首次上传作业 -->
+    <select id="getFirstRst" parameterType="activity" resultType="int">
+        SELECT count(1)
+        FROM ke_task a 
+        WHERE DATE_FORMAT(a.create_time,'%Y%m%d%H%i%s') > DATE_FORMAT(NOW(),'%Y%m%d170000')
+        AND a.user_id=#{userId}
+        AND a.photo_sort='01' 
+    </select>
+    
+    <!-- 判断当天是否已领取过奖品 -->
+    <select id="getTodayCount" parameterType="activity" resultType="int">
+        SELECT count(1)
+        FROM ke_activity a 
+        WHERE DATE_FORMAT(a.create_time,'%Y%m%d') = DATE_FORMAT(NOW(),'%Y%m%d')
+        AND (a.user_id=#{userId} OR a.qq=#{qq})
+    </select>
+
+    <!-- 获取上传作业顺序 -->
+    <select id="getOrderList" parameterType="activity" resultType="map">
+        SELECT MIN(a.create_time),a.user_id 
+        FROM ke_task a 
+        WHERE a.photo_sort='01' 
+            AND DATE_FORMAT(a.create_time,'%Y%m%d%H%i%s') > DATE_FORMAT(NOW(),'%Y%m%d170000')
+        GROUP BY a.user_id 
+        ORDER BY a.create_time
+    </select>
+
+    <!-- 登录奖品信息-->
+    <insert id="addContacts" parameterType="activity" useGeneratedKeys="true"
+        keyProperty="id">
+        insert into ke_activity
+        (
+	        user_id,
+	        qq,
+	        order_num,
+	        prize,
+	        receive,
+	        create_time,
+	        update_time) 
+        values (
+	        #{userId},
+	        #{qq},
+	        #{orderNum},
+	        #{prize},
+	        #{receive},
+	        NOW(),
+	        NOW()
+        )
+    </insert>
+</mapper>

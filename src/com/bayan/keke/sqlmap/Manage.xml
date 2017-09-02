@@ -1,0 +1,711 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="manage">
+
+    <!-- 查询老师当天提现记录-->
+    <select id="searchPayRecord" parameterType="manage" resultType="teaIncomeRcd">
+        SELECT id AS id,
+            teacher_id AS teacherId,
+            amount AS amount,
+            type AS type,
+            status AS status,
+            DATE_FORMAT(NOW(),'%Y%m%d%H%i%s') AS batchNo,
+            result AS result,
+            serial_number AS serialNumber,
+            toAccount AS toAccount,
+            toName AS toName,
+            alipay_number AS alipayNumber,
+            reason AS reason,
+            DATE_FORMAT(create_time,'%Y-%m-%d %H:%i:%s') AS createTime,
+            finish_time AS finishTime,
+            update_time AS updateTime
+        FROM ke_tea_income_record
+        WHERE status=#{searchType}
+        AND type='1'
+        <if test="searchType != null and searchType == '0'.toString()">
+            AND batch_no IS NULL
+        </if>
+        <if test="searchType != null and searchType == '1'.toString()">
+            AND batch_no IS NOT NULL
+        </if>
+        <if test="searchType != null and searchType == '2'.toString()">
+            AND batch_no IS NOT NULL
+        </if>
+        <if test="searchType == null">
+            AND 1=0
+        </if>
+        ORDER BY create_time
+    </select>
+    
+    <!-- 推广查询老师当天提现记录-->
+    <select id="searchPayRecordTg" parameterType="manage" resultType="teaIncomeRcd">
+        SELECT id AS id,
+            teacher_id AS teacherId,
+            amount AS amount,
+            type AS type,
+            status AS status,
+            DATE_FORMAT(NOW(),'%Y%m%d%H%i%s') AS batchNo,
+            result AS result,
+            serial_number AS serialNumber,
+            toAccount AS toAccount,
+            toName AS toName,
+            alipay_number AS alipayNumber,
+            reason AS reason,
+            DATE_FORMAT(create_time,'%Y-%m-%d %H:%i:%s') AS createTime,
+            finish_time AS finishTime,
+            update_time AS updateTime
+        FROM ke_promote_income_record
+        WHERE status=#{searchType}
+        AND type='1'
+        <if test="searchType != null and searchType == '0'.toString()">
+            AND batch_no IS NULL
+        </if>
+        <if test="searchType != null and searchType == '1'.toString()">
+            AND batch_no IS NOT NULL
+        </if>
+        <if test="searchType != null and searchType == '2'.toString()">
+            AND batch_no IS NOT NULL
+        </if>
+        <if test="searchType == null">
+            AND 1=0
+        </if>
+        ORDER BY create_time
+    </select>
+    
+    <!-- 更改批次号和状态-->
+    <update id="updatePayStatus" parameterType="manage">
+           UPDATE ke_tea_income_record
+           SET batch_no=#{batchNo},
+           status='1',
+           update_time=now()
+           WHERE status=#{searchType}
+            AND type='1'
+        <if test="searchType != null and searchType == '0'.toString()">
+            AND batch_no IS NULL
+        </if>
+        <if test="searchType != null and searchType == '1'.toString()">
+            AND batch_no IS NOT NULL
+        </if>
+    </update>
+    
+    <!-- 推广更改批次号和状态-->
+    <update id="updatePayStatusTg" parameterType="manage">
+           UPDATE ke_promote_income_record
+           SET batch_no=#{batchNo},
+           status='1',
+           update_time=now()
+           WHERE status=#{searchType}
+            AND type='1'
+        <if test="searchType != null and searchType == '0'.toString()">
+            AND batch_no IS NULL
+        </if>
+        <if test="searchType != null and searchType == '1'.toString()">
+            AND batch_no IS NOT NULL
+        </if>
+    </update>
+    
+    <!-- 审批资格证-->
+    <update id="updateApprvStatus" parameterType="manage">
+           UPDATE ke_teacher
+           SET apprv_status=#{approveStatus},
+           update_time=now()
+           WHERE teacher_id=#{teacherId}
+    </update>
+    
+    <!-- 获取老师资格证信息-->
+    <select id="searchCertification" parameterType="manage" resultType="teaus">
+        SELECT id AS id,
+            teacher_id AS teacherId,
+            teacher_name AS userName,
+            sex AS sex,
+            phone_number AS phoneNumber,
+            certificate_url AS certificateUrl,
+            apprv_status AS apprvStatus
+        FROM ke_teacher
+        WHERE apprv_status=#{approveStatus}
+    </select>
+    
+    <!-- 处理批次番号-->
+    <select id="searchBatchNo" parameterType="string" resultType="int">
+        SELECT count(batch_no)
+        FROM ke_tea_income_record
+        WHERE batch_no = #{batchNo}
+        AND alipay_number IS NOT NULL
+    </select>
+    
+    <!-- 推广处理批次番号-->
+    <select id="searchBatchNoTg" parameterType="string" resultType="int">
+        SELECT count(batch_no)
+        FROM ke_promote_income_record
+        WHERE batch_no = #{batchNo}
+        AND alipay_number IS NOT NULL
+    </select>
+    
+    <!-- 更新支付宝回调信息-->
+    <update id="updateAipayInfo" parameterType="teaIncomeRcd">
+           UPDATE ke_tea_income_record
+           SET status='2',
+           result=#{result},
+           alipay_number=#{alipayNumber},
+           reason=#{reason},
+           finish_time=#{finishTime},
+           update_time=now()
+           WHERE serial_number=#{serialNumber}
+            AND type='1'
+            AND batch_no =#{batchNo}
+    </update>
+    
+    <!-- 推广更新支付宝回调信息-->
+    <update id="updateAipayInfoTg" parameterType="teaIncomeRcd">
+           UPDATE ke_promote_income_record
+           SET status='2',
+           result=#{result},
+           alipay_number=#{alipayNumber},
+           reason=#{reason},
+           finish_time=#{finishTime},
+           update_time=now()
+           WHERE serial_number=#{serialNumber}
+            AND type='1'
+            AND batch_no =#{batchNo}
+    </update>
+    
+    <!-- 提现失败，金额退回-->
+    <update id="returnTeaIncome" parameterType="teaIncomeRcd">
+           UPDATE ke_tea_income
+           SET input_income=input_income + #{amount},
+           output_income=output_income - #{amount},
+           update_time=now()
+           WHERE teacher_id=#{teacherId}
+    </update>
+    
+    <!-- 推广提现失败，金额退回-->
+    <update id="returnTeaIncomeTg" parameterType="teaIncomeRcd">
+           UPDATE ke_promote_income
+           SET input_income=input_income + #{amount},
+           output_income=output_income - #{amount},
+           update_time=now()
+           WHERE teacher_id=#{teacherId}
+    </update>
+    
+    <!-- 添加老师收支退款记录-->
+    <insert id="insReturnRcd" parameterType="teaIncomeRcd">
+        INSERT INTO ke_tea_income_record(teacher_id,amount,type,reason,create_time)
+        VALUES(#{teacherId},#{amount},#{type},#{reason},NOW())
+    </insert>
+    
+    <!-- 推广添加老师收支退款记录-->
+    <insert id="insReturnRcdTg" parameterType="teaIncomeRcd">
+        INSERT INTO ke_promote_income_record(teacher_id,amount,type,reason,create_time)
+        VALUES(#{teacherId},#{amount},#{type},#{reason},NOW())
+    </insert>
+    
+    <!-- 根据流水号查询老师id-->
+    <select id="selRcdWithSerNum" parameterType="teaIncomeRcd" resultType="teaIncomeRcd">
+        SELECT teacher_id AS teacherId
+        FROM ke_tea_income_record
+        WHERE serial_number=#{serialNumber}
+    </select>
+    
+    <!-- 推广根据流水号查询老师id-->
+    <select id="selRcdWithSerNumTg" parameterType="teaIncomeRcd" resultType="teaIncomeRcd">
+        SELECT teacher_id AS teacherId
+        FROM ke_promote_income_record
+        WHERE serial_number=#{serialNumber}
+    </select>
+    
+    <!-- 批改老师，推广老师注册人数，学生注册人数，作业总数-->
+    <select id="selectTongji" parameterType="map" resultType="int">
+        SELECT count(1) FROM ke_teacher a
+            WHERE a.type IN ('0','1')
+        UNION ALL
+        SELECT count(1) FROM ke_teacher b
+            WHERE b.type = '2'
+        UNION ALL
+        SELECT count(1) FROM ke_user
+        UNION ALL
+        SELECT count(1) FROM ke_task
+    </select>
+    
+    <!-- 获取注册学生信息 -->
+    <select id="selUserInfoList" resultType="map" parameterType="map">
+        SELECT CONCAT('U',a.id) id,
+        a.user_id userId,
+        a.user_name name,
+        a.grade grade,
+        a.phone_number phoneNumber,
+        a.user_level stuLevel,
+        DATE_FORMAT(a.create_time, '%Y-%m-%d') createTime,
+        b.city_name cityName,
+        c.city_name provinceName,
+        a.type type,
+        '0' userType,
+        a.org_id as orgId
+        FROM ke_user a
+        LEFT JOIN ke_city b
+        ON a.city_code=b.city_code
+        LEFT JOIN ke_city c
+        ON a.province_code=c.city_code
+        limit
+        #{page},#{size}
+    </select>
+    
+    <!-- 获取批改老师注册信息 -->
+    <select id="selTeacherInfoList" resultType="map" parameterType="map">
+        SELECT CONCAT('T',a.id) id,
+        a.teacher_id teacherId,
+        a.teacher_name name,
+        a.grade grade,
+        a.sex sex,
+        a.phone_number phoneNumber,
+        a.subject_id subjectId,
+        a.certificate_url certificateUrl,
+        DATE_FORMAT(a.create_time, '%Y-%m-%d') createTime,
+        b.city_name cityName,
+        c.city_name provinceName,
+        a.type type,
+        '1' userType,
+        apprv_status apprvStatus,
+        a.org_id orgId
+        FROM ke_teacher a
+        LEFT JOIN ke_city b
+        ON a.city_code=b.city_code
+        LEFT JOIN ke_city c
+        ON a.province_code=c.city_code
+        WHERE a.type IN ('0','1','9')
+        limit
+        #{page},#{size}
+    </select>
+    
+    <!-- 获取推广老师注册信息 -->
+    <select id="selTuiguangTeacherList" resultType="map" parameterType="map">
+        SELECT CONCAT('T',a.id) id,
+        a.teacher_id teacherId,
+        a.teacher_name name,
+        a.grade grade,
+        a.sex sex,
+        a.phone_number phoneNumber,
+        a.subject_id subjectId,
+        DATE_FORMAT(a.create_time, '%Y-%m-%d') createTime,
+        b.city_name cityName,
+        c.city_name provinceName,
+        a.type type,
+        '1' userType,
+        apprv_status apprvStatus
+        FROM ke_teacher a
+        LEFT JOIN ke_city b
+        ON a.city_code=b.city_code
+        LEFT JOIN ke_city c
+        ON a.province_code=c.city_code
+        WHERE a.type = '2'
+        limit
+        #{page},#{size}
+    </select>
+    
+    <!-- 老师学生注册日均增长统计 -->
+    <resultMap type="map" id="dayMap">
+        <collection property="regCount" javaType="list" ofType="int">
+            <result column="regCount" />
+        </collection>
+        <collection property="registerTime" javaType="list" ofType="string">
+            <result column="registerTime" />
+        </collection>
+    </resultMap>
+    <select id="dayCount" parameterType="map" resultMap="dayMap">
+        SELECT
+            <if test="tongjiType != null and tongjiType == '0'.toString()">
+            (SELECT COUNT(*) FROM ke_user
+               WHERE DATE_FORMAT(create_time, '%Y-%m-%d') = ke_date.regTime
+             ) AS regCount,
+             </if>
+            <if test="tongjiType != null and tongjiType == '1'.toString()">
+            (SELECT COUNT(*) FROM ke_teacher
+               WHERE DATE_FORMAT(create_time, '%Y-%m-%d') = ke_date.regTime
+             ) AS regCount,
+             </if>
+            ke_date.regTime AS registerTime
+        FROM
+            ke_date
+        WHERE
+            ke_date.regTime >= #{startDate}
+            AND ke_date.regTime &lt;=#{endDate}
+    </select>
+    
+    <!-- 批量生成FID -->
+    <insert id="insertFids" parameterType="list" useGeneratedKeys="true">
+        <selectKey resultType="long" keyProperty="id" order="AFTER">  
+            SELECT LAST_INSERT_ID()  
+        </selectKey> 
+        insert into ke_code(key_code,code_type,discount_amount,count_pay,create_time,start_time,end_time,status) values
+        <foreach collection="list" item="item" index="index" separator=","> 
+        (#{item.fid},'0',#{item.discountAmount},'1',now(),now(),date_add(now(),interval 20 month),'0')
+        </foreach>
+    </insert>
+    
+    <!-- 查询FID个数 -->
+    <select id="countFid" parameterType="map" resultType="int">
+        SELECT count(1) FROM ke_code a
+        LEFT JOIN ke_fid_info b
+        ON a.key_code = b.free_key
+        <where>
+            a.code_type = '0'
+            <if test="fidType != null and fidType == '0'.toString()">
+               AND b.id IS NULL
+            </if>
+            <if test="fidType != null and fidType == '1'.toString()">
+               AND b.id IS NOT NULL
+            </if>
+        </where>
+    </select>
+    
+    <!-- 查询FID信息 -->
+    <select id="selFidInfo" parameterType="map" resultType="map">
+        SELECT a.id AS id,
+        a.key_code AS fid,
+        DATE_FORMAT(a.start_time,'%Y-%m-%d') AS startTime,
+        DATE_FORMAT(a.end_time,'%Y-%m-%d') AS endTime,
+        a.count_pay AS countPayLimit,
+        a.discount_amount discountAmount,
+        b.count_pay AS useCount,
+        c.user_name AS userName,
+        c.phone_number AS phoneNumber
+        FROM ke_code a
+        LEFT JOIN ke_fid_info b
+        ON a.key_code = b.free_key
+        LEFT JOIN ke_user c
+        ON b.user_id = c.user_id
+        <where>
+            a.code_type = '0'
+            <if test="fidType != null and fidType == '0'.toString()">
+               AND b.id IS NULL
+            </if>
+            <if test="fidType != null and fidType == '1'.toString()">
+               AND b.id IS NOT NULL
+            </if>
+        </where>
+        limit
+        #{page},#{size}
+    </select>
+    
+    <!-- 查询FID是否存在 -->
+    <select id="selFid" parameterType="map" resultType="int">
+        SELECT count(1) FROM ke_code
+        WHERE key_code=#{fid}
+    </select>
+    
+    <!-- 查询SID个数 -->
+    <select id="countSid" parameterType="map" resultType="int">
+        SELECT count(1) FROM ke_code a
+        LEFT JOIN ke_sid_info b
+        ON a.key_code = b.general_key
+        <where>
+            a.code_type = '1'
+            <if test="sidType != null and sidType == '0'.toString()">
+               AND b.count_pay = 0
+            </if>
+            <if test="sidType != null and sidType == '1'.toString()">
+               AND b.count_pay > 0
+            </if>
+        </where>
+    </select>
+    
+    <!-- 查询SID信息 -->
+    <select id="selSidInfo" parameterType="map" resultType="map">
+        SELECT a.id AS id,
+        a.key_code AS sid,
+        DATE_FORMAT(a.start_time,'%Y-%m-%d') AS startTime,
+        DATE_FORMAT(a.end_time,'%Y-%m-%d') AS endTime,
+        a.discount_amount discountAmount,
+        a.count_pay AS countPayLimit,
+        a.status AS status,
+        b.count_pay AS useCount,
+        c.teacher_name AS teacherName,
+        c.phone_number AS phoneNumber,
+        DATE_FORMAT(c.create_time,'%Y-%m-%d') AS registerTime,
+        d.city_name AS cityName
+        FROM ke_code a
+        LEFT JOIN ke_sid_info b
+        ON a.key_code = b.general_key
+        LEFT JOIN ke_teacher c
+        ON b.teacher_id = c.teacher_id
+        LEFT JOIN ke_city d
+        ON c.city_code = d.city_code
+        <where>
+            a.code_type = '1'
+            <if test="sidType != null and sidType == '0'.toString()">
+               AND b.count_pay = 0
+            </if>
+            <if test="sidType != null and sidType == '1'.toString()">
+               AND b.count_pay > 0
+            </if>
+        </where>
+        limit
+        #{page},#{size}
+    </select>
+    
+    <!-- 更改批次号和状态-->
+    <update id="invalidSid" parameterType="manage">
+           UPDATE ke_code
+           SET status='1'
+           WHERE key_code=#{sid}
+           AND code_type='1'
+           AND status='0'
+    </update>
+    
+    <!-- 查询单个老师的SID信息 -->
+    <select id="selSidWithTeacherId" parameterType="manage" resultType="map">
+        SELECT a.general_key AS sid,
+        a.count_pay AS countPay,
+        b.status AS status,
+        b.discount_amount AS discountAmount,
+        c.phone_number AS phoneNumber
+        FROM ke_sid_info a
+        INNER JOIN ke_code b
+        ON a.general_key=b.key_code
+        LEFT JOIN ke_teacher c
+        ON a.teacher_id=c.teacher_id
+        WHERE a.teacher_id=#{teacherId}
+        AND b.code_type='1'
+    </select>
+    
+    <!-- 查询推广老师总收入 -->
+    <select id="selTeaIncomeTotal" parameterType="manage" resultType="teaIncome">
+        SELECT total_income AS totalIncome,
+            input_income AS inputIncome,
+            output_income AS outputIncome
+        FROM ke_promote_income
+        WHERE teacher_id=#{teacherId}
+    </select>
+    
+    <!-- 查询推广老师当天提现记录-->
+    <select id="selOutMoneyToday" parameterType="manage" resultType="teaIncomeRcd">
+        SELECT teacher_id AS teacherId,
+            amount AS amount,
+            type AS type
+        FROM ke_promote_income_record
+        WHERE DATE_FORMAT(create_time,'%Y-%m-%d') = DATE_FORMAT(NOW(),'%Y-%m-%d')
+        AND type='1'
+        AND teacher_id=#{teacherId}
+    </select>
+    
+    <!-- 推广老师提现-->
+    <update id="updateTeaIncome" parameterType="manage">
+           UPDATE ke_promote_income
+           SET input_income=input_income - #{outputMoney},
+           output_income=output_income + #{outputMoney},
+           update_time=now()
+           WHERE teacher_id=#{teacherId}
+    </update>
+    
+    <!-- 添加推广老师提现记录-->
+    <insert id="insTeaOutRcd" parameterType="teaIncomeRcd">
+        INSERT INTO ke_promote_income_record(
+            teacher_id,amount,type,charge,status,batch_no,serial_number,toAccount,toName,create_time,comment)
+        VALUES(
+            #{teacherId},#{amount},#{type},#{charge},#{status},#{batchNo},#{serialNumber},#{toAccount},#{toName},NOW(),#{comment})
+    </insert>
+    
+    <!-- 查询单个SID使用次数 -->
+    <select id="countSidWithTeaId" parameterType="map" resultType="int">
+        SELECT count(b.id) AS countSid
+        FROM ke_sid_info a
+        INNER JOIN ke_pay_record b
+        ON a.general_key=b.key_code
+        WHERE a.teacher_id=#{teacherId}
+        <if test="startDate != null and startDate != ''">
+           AND DATE_FORMAT(b.create_time,'%Y-%m-%d') >= #{startDate}
+        </if>
+        <if test="endDate != null and endDate != ''">
+           AND DATE_FORMAT(b.create_time,'%Y-%m-%d') &lt;=#{endDate}
+        </if>
+    </select>
+    
+    <!-- 查询SID单个使用详情 -->
+    <select id="selSidInfoWithTeaId" parameterType="map" resultType="map">
+        SELECT a.teacher_id AS teacherId,
+        a.general_key AS sid,
+        DATE_FORMAT(b.create_time,'%Y-%m-%d') AS createTime,
+        b.user_id AS userId,
+        c.user_name AS userName,
+        c.grade AS grade,
+        c.phone_number AS phoneNumber,
+        d.city_name AS cityName,
+        e.city_name AS provinceName
+        FROM ke_sid_info a
+        INNER JOIN ke_pay_record b
+        ON a.general_key = b.key_code
+        LEFT JOIN ke_user c
+        ON b.user_id=c.user_id
+        LEFT JOIN ke_city d
+        ON c.city_code = d.city_code
+        LEFT JOIN ke_city e
+        ON c.province_code=e.city_code
+        WHERE a.teacher_id=#{teacherId}
+        <if test="startDate != null and startDate != ''">
+           AND DATE_FORMAT(b.create_time,'%Y-%m-%d') >= #{startDate}
+        </if>
+        <if test="endDate != null and endDate != ''">
+           AND DATE_FORMAT(b.create_time,'%Y-%m-%d') &lt;=#{endDate}
+        </if>
+        limit
+        #{page},#{size}
+    </select>
+    
+    <!-- 查询心愿个数 -->
+    <select id="countWish" parameterType="map" resultType="int">
+        SELECT count(1) FROM ke_point WHERE comment IS NOT NULL
+    </select>
+    
+    <!-- 查询心愿内容 -->
+    <select id="selWishList" parameterType="map" resultType="map">
+        SELECT a.user_id AS userId,
+        b.user_name AS userName,
+        a.point_all AS pointAll,
+        a.comment AS comment,
+        DATE_FORMAT(a.create_time, '%Y-%m-%d') AS createTime
+        FROM  ke_point a
+        LEFT JOIN ke_user b
+        ON a.user_id = b.user_id 
+        WHERE a.comment IS NOT NULL
+        limit
+        #{page},#{size}
+    </select>
+    
+    <!-- 获取收入支出信息 -->
+    <resultMap type="map" id="inoutMap">
+        <collection property="inoutCnt" javaType="list" ofType="int">
+            <result column="inoutCnt" />
+        </collection>
+        <collection property="countTime" javaType="list" ofType="string">
+            <result column="countTime" />
+        </collection>
+    </resultMap>
+    <select id="selIncomeOutgo" parameterType="manage" resultMap="inoutMap">
+        SELECT
+            <if test="tongjiType != null and tongjiType == '0'.toString()">
+            IFNULL((SELECT SUM(pay_money) FROM ke_pay_record
+               WHERE DATE_FORMAT(create_time, '%Y-%m-%d') = c.regTime
+             ),'0') AS inoutCnt,
+             </if>
+            <if test="tongjiType != null and tongjiType == '1'.toString()">
+            IFNULL((SELECT SUM(d.amount) FROM 
+                (SELECT amount,DATE_FORMAT(a.finish_time, '%Y-%m-%d') finTime FROM ke_promote_income_record a
+                    WHERE a.type='1'
+                    AND a.result='S'
+                 UNION ALL
+                 SELECT amount,DATE_FORMAT(b.finish_time, '%Y-%m-%d') finTime FROM ke_tea_income_record b
+                    WHERE b.type='1'
+                    AND b.result='S'
+                    ) d
+                WHERE d.finTime = c.regTime
+             ),'0') AS inoutCnt,
+             </if>
+            c.regTime AS countTime
+        FROM
+            ke_date c
+        WHERE
+            c.regTime >= #{startDate}
+            AND c.regTime &lt;=#{endDate}
+    </select>
+    
+    <!-- 总收入查询 -->
+    <select id="selIncomeTotal" parameterType="manage" resultType="map">
+        SELECT SUM(pay_money) AS incomeTotal FROM ke_pay_record
+    </select>
+    
+    <!-- 总支出查询 -->
+    <select id="selOutgoTotal" parameterType="manage" resultType="map">
+        SELECT SUM(d.amount) AS outgoTotal FROM 
+        (SELECT amount FROM ke_promote_income_record a
+            WHERE a.type='1'
+            AND a.result='S'
+         UNION ALL
+         SELECT amount FROM ke_tea_income_record b
+            WHERE b.type='1'
+            AND b.result='S'
+            ) d
+    </select>
+    
+    <!-- ==================================举报处理SQL====================== -->
+    <!-- 获取举报内容-->
+    <select id="searchReport" parameterType="manage" resultType="map">
+        SELECT a.id,
+            a.photo_id,
+            a.user_id,
+            d.user_name,
+            a.teacher_id,
+            a.content_stu,
+            a.result,
+            a.tousu_time,
+            a.deal_time,
+            a.content_adm,
+            a.status,
+            b.photo_url,
+            b.comment,
+            c.teacher_name
+        FROM ke_report a
+        LEFT JOIN ke_task b
+        ON a.photo_id = b.photo_id
+        LEFT JOIN ke_teacher c
+        ON a.teacher_id = c.teacher_id
+        LEFT JOIN ke_user d
+        ON a.user_id = d.user_id
+        WHERE a.status=#{reportStatus}
+    </select>
+    
+    <!-- 禁用老师-->
+    <update id="invalidTeacher" parameterType="manage">
+           UPDATE ke_teacher
+           SET type='9'
+           WHERE teacher_id=#{teacherId}
+    </update>
+    
+    <!-- 更新举报处理结果-->
+    <update id="updateReportResult" parameterType="map">
+           UPDATE ke_report
+           SET result=#{result},
+           deal_time=NOW(),
+           status=#{status},
+           content_adm=#{contentAdm}
+           WHERE photo_id=#{photoId}
+    </update>
+    
+    <!-- 设备查询-->
+    <select id="selDevices" parameterType="map" resultType="map">
+        SELECT device_id,system_type
+        FROM ke_device
+        WHERE user_id=#{userId}
+        AND flag=#{flag}
+    </select>
+    
+    <!-- 作业批改明细查询-->
+    <select id="selPhotoInfo" parameterType="map" resultType="map">
+        SELECT a.photo_id,
+        a.photo_url,
+        a.comment,
+        b.position_x,
+        b.position_y,
+        b.direction,
+        b.result,
+        b.reason,
+        b.resolvedFlag
+        FROM ke_task a
+        LEFT JOIN ke_mark b
+        ON a.photo_id=b.photo_id
+        WHERE a.photo_id=#{photoId}
+    </select>
+    
+    <!-- 查询序列号对应的设备ID-->
+    <select id="selDeviceWithSerial" parameterType="map" resultType="string">
+        SELECT device_id
+        FROM ke_device a
+        INNER JOIN ke_tea_income_record b
+        ON a.user_id = b.teacher_id
+        WHERE a.flag='1'
+        AND a.device_id <![CDATA[<>]]> 'nodeviceid'
+        AND b.serial_number IN
+        <foreach collection="list" open="(" close=")" separator="," item="item" index="index">
+        #{item}
+        </foreach>
+        AND b.type = '1'
+    </select>
+</mapper>

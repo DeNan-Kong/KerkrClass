@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="teaSub">
+
+    <!-- 获取该老师批改中的作业-->
+    <select id="getCorrectingTask" parameterType="teaSub" resultType="taskVo">
+        SELECT
+                a.group_id AS groupId,
+                a.photo_id AS photoId,
+                a.photo_url AS photoUrl,
+                a.subject_id AS subjectId,
+                a.photo_sort AS photoSort,
+				a.width as width,
+	       		a.height as height,
+                b.user_name AS userName,
+                DATE_FORMAT(a.create_time,'%H:%i') AS createTime
+            FROM ke_task a
+            INNER JOIN ke_user b ON a.user_id = b.user_id
+            WHERE 
+	            b.org_id = #{orgId}
+            AND a.subject_id=#{subjectType}
+            AND a.task_status='CORRECTING'
+        	AND a.teacher_id=#{teacherId}
+	        ORDER BY a.create_time LIMIT 0,1
+    </select>
+    
+    <!-- 获取未批改的作业-->
+    <select id="getUncorrectedTask" parameterType="teaSub" resultType="taskVo">
+            SELECT
+                a.group_id AS groupId,
+                a.photo_id AS photoId,
+                a.photo_url AS photoUrl,
+                a.subject_id AS subjectId,
+                a.photo_sort AS photoSort,
+				a.width as width,
+	        	a.height as height,
+                b.user_name AS userName,
+                DATE_FORMAT(a.create_time,'%H:%i') AS createTime
+            FROM ke_task a
+            INNER JOIN ke_user b 
+            ON a.user_id = b.user_id
+            INNER JOIN ke_teacher c
+            ON b.grade = c.grade
+            WHERE 
+	            b.org_id = #{orgId}
+            AND a.delete_flag='0'
+            AND a.subject_id=#{subjectType}
+            AND a.task_status='UNCORRECTED'
+            AND c.teacher_id=#{teacherId}
+	        ORDER BY a.create_time LIMIT 0,1
+    </select>
+    
+    <!-- 更新作业状态和批改老师-->
+    <update id="updateTaskStatus" parameterType="taskVo">
+           UPDATE ke_task
+           SET teacher_id=#{teacherId},
+                  task_status='CORRECTING',
+                  update_time=now()
+           WHERE subject_id=#{subjectId}
+           AND group_id=#{groupId}
+           AND teacher_id IS NULL
+    </update>
+
+    <!-- 获取前一张照片信息-->
+    <select id="getPreviousTask" parameterType="teaSub" resultType="taskVo">
+        SELECT
+            group_id AS groupId,
+            photo_id AS photoId,
+            photo_url AS photoUrl,
+            width as width,
+	    height as height,
+            subject_id AS subjectId,
+            photo_sort AS photoSort
+        FROM ke_task
+        WHERE task_status<![CDATA[<>]]>'INVALID'
+        AND subject_id=#{subjectType}
+           AND photo_sort=#{photoSort}
+           AND group_id=#{groupId}
+           AND user_id=(
+           SELECT user_id FROM ke_task 
+           WHERE photo_id=#{photoId} AND group_id=#{groupId} 
+           AND teacher_id=#{teacherId})
+    </select>
+    
+    <!-- 放弃作业-->
+    <update id="giveUpTask" parameterType="teaSub">
+           UPDATE ke_task
+           SET teacher_id=NULL,
+                  task_status='UNCORRECTED',
+               update_time=now()
+           WHERE task_status='CORRECTING'
+           and subject_id=#{subjectType}
+           and photo_id=#{photoId}
+           and teacher_id=#{teacherId}
+    </update>
+    
+    <!-- 模糊作业-->
+    <update id="fuzzyTask" parameterType="teaSub">
+           UPDATE ke_task
+           SET task_status='INVALID',
+               delete_flag='1',
+               comment=#{cause},
+               update_time=now()
+           WHERE subject_id=#{subjectType}
+           AND photo_id=#{photoId}
+           AND teacher_id=#{teacherId}
+    </update>
+    
+    <!-- 清除之前打的图片标签信息 -->
+    <delete id="delMark" parameterType="teaSub">
+        DELETE FROM ke_mark 
+        WHERE photo_id=#{photoId}
+    </delete>
+    
+    <!-- 作业评语-->
+    <update id="addComment" parameterType="teaSub">
+           UPDATE ke_task
+           SET comment=#{comment},
+               task_status='FINISH',
+               update_time=now()
+           WHERE subject_id=#{subjectType}
+           AND photo_id=#{photoId}
+           AND teacher_id=#{teacherId}
+    </update>
+    
+    <!-- 获取学生设备信息-->
+    <select id="getDevices" parameterType="teaSub" resultType="string">
+        SELECT
+            a.device_id AS deviceId
+        FROM ke_device a
+        WHERE a.user_id=(
+           SELECT user_id FROM ke_task 
+           WHERE photo_id=#{photoId} AND subject_id=#{subjectType}
+           AND teacher_id=#{teacherId})
+           AND a.flag = '0'
+    </select>
+    
+    <!-- 获取未批改的作业件数-->
+    <select id="getUncorrectedCount" parameterType="teaSub" resultType="int">
+        SELECT
+            count(1)
+        FROM ke_task a
+        WHERE a.task_status in ('UNCORRECTED','CORRECTING')
+        AND a.subject_id=#{subjectType}
+        AND (a.user_id,a.group_id) = (
+           SELECT b.user_id,b.group_id FROM ke_task b
+           WHERE b.photo_id=#{photoId} AND b.subject_id=#{subjectType}
+           AND b.teacher_id=#{teacherId})
+    </select>
+    
+    <!-- 插入批改结果 -->
+    <insert id="insertMarks" parameterType="list" useGeneratedKeys="true">
+        <selectKey resultType="long" keyProperty="id" order="AFTER">  
+            SELECT LAST_INSERT_ID()  
+        </selectKey> 
+        insert into ke_mark(user_id,photo_id,group_id,position_x,position_y,direction,result,reason,resolvedFlag,create_time) values
+        <foreach collection="list" item="item" index="index" separator=","> 
+        (#{item.userId},#{item.photoId},#{item.groupId},#{item.pointx},#{item.pointy},#{item.direction},#{item.result},#{item.content},#{item.resolvedFlag},now())
+        </foreach>
+    </insert>
+    
+    <!-- 获取图片信息 -->
+    <select id="getTaskWithPhotoId" parameterType="teaSub" resultType="taskVo">
+        select 
+            user_id AS userId,
+            photo_id AS photoId,
+            photo_sort AS photoSort,
+            group_id AS groupId,
+            teacher_id AS teacherId
+        from 
+            ke_task
+        where 
+            photo_id=#{photoId}
+    </select>
+    
+    <!-- 查询老师总收入 -->
+    <select id="selTeaIncomeTotal" parameterType="teaSub" resultType="teaIncome">
+        SELECT total_income AS totalIncome,
+            input_income AS inputIncome,
+            output_income AS outputIncome
+        FROM ke_tea_income
+        WHERE teacher_id=#{teacherId}
+    </select>
+    
+    <!-- 查询老师当天收入 -->
+    <select id="selTeaIncomeToday" parameterType="teaSub" resultType="string">
+        SELECT sum(amount) FROM ke_tea_income_record
+        WHERE DATE_FORMAT(create_time,'%Y-%m-%d') = DATE_FORMAT(NOW(),'%Y-%m-%d')
+        AND type='0'
+        AND teacher_id=#{teacherId}
+    </select>
+    
+    <!-- 查询老师批改完成，学生未确认件数，作为即将到账 -->
+    <select id="selFinishCntWithTeaId" parameterType="teaSub" resultType="string">
+        SELECT COUNT(1) FROM ke_task
+        WHERE teacher_id=#{teacherId}
+        AND task_status='FINISH'
+    </select>
+    
+    <!-- 查询老师当天提现记录-->
+    <select id="selOutMoneyToday" parameterType="teaSub" resultType="teaIncomeRcd">
+        SELECT teacher_id AS teacherId,
+            amount AS amount,
+            type AS type
+        FROM ke_tea_income_record
+        WHERE DATE_FORMAT(create_time,'%Y-%m-%d') = DATE_FORMAT(NOW(),'%Y-%m-%d')
+        AND type='1'
+        AND teacher_id=#{teacherId}
+    </select>
+    
+    <!-- 老师提现-->
+    <update id="updateTeaIncome" parameterType="teaSub">
+           UPDATE ke_tea_income
+           SET input_income=input_income - #{outputMoney},
+           output_income=output_income + #{outputMoney},
+           update_time=now()
+           WHERE teacher_id=#{teacherId}
+    </update>
+    
+    <!-- 添加老师提现记录-->
+    <insert id="insTeaOutRcd" parameterType="teaIncomeRcd">
+        INSERT INTO ke_tea_income_record(
+            teacher_id,amount,type,status,batch_no,serial_number,toAccount,toName,create_time)
+        VALUES(
+            #{teacherId},#{amount},#{type},#{status},#{batchNo},#{serialNumber},#{toAccount},#{toName},NOW())
+    </insert>
+    
+    <!-- 查看当前未批改作业数 -->
+    <select id="taskCount" resultType="string" parameterType="teaSub">
+        SELECT COUNT(1) AS total FROM ke_task a
+        INNER JOIN ke_user b
+        ON a.user_id=b.user_id
+        WHERE a.task_status = 'UNCORRECTED'
+        AND a.delete_flag = '0'
+        AND b.org_id = #{orgId}
+    </select>
+    
+    <!-- 取得批改作业老师的类型 -->
+    <select id="getType" resultType="string" parameterType="teaSub">
+        SELECT type AS type FROM ke_teacher WHERE teacher_id=#{teacherId} 
+    </select>
+    
+    <!-- 取得批改作业老师的所属组织 -->
+    <select id="getOrgId" resultType="string" parameterType="teaSub">
+        SELECT org_id AS orgId FROM ke_teacher WHERE teacher_id=#{teacherId} 
+    </select>
+    
+    <!-- 查看当前最早一张未批改作业的上传时间 -->
+    <select id="uploadTime" resultType="string" parameterType="teaSub">
+	    SELECT a.create_time AS createTime FROM ke_task a
+		WHERE a.task_status = 'UNCORRECTED'
+		AND a.delete_flag = '0'
+		AND a.user_id IN (SELECT b.user_id FROM ke_user b WHERE b.type = #{type})
+		ORDER BY a.create_time ASC LIMIT 0,1
+    </select>
+    
+    <!-- 查看当前正在批改作业的时间超过10分钟的作业信息-->
+    <select id="tenMinTime" resultType="teaSub">
+	    SELECT a.teacher_id AS teacherId,a.subject_id AS subjectType,a.photo_id AS photoId
+		FROM ke_task a
+		WHERE a.point IS NULL
+		AND a.task_status='CORRECTING'
+		AND DATE_FORMAT(a.update_time,'%Y-%m-%d %H:%i:%S') <![CDATA[<]]> DATE_FORMAT(DATE_SUB(NOW(),INTERVAL 15 MINUTE),'%Y-%m-%d %H:%i:%S')
+	</select>
+	
+	<!-- 查看当前未批改作业的时间超过10分钟的作业份数-->
+    <select id="twentyMinTime" resultType="string">
+    	SELECT count(*) FROM ke_task 
+		WHERE teacher_id IS NULL
+		AND point IS NULL
+		AND comment IS NULL
+		AND task_status = 'UNCORRECTED'
+		AND update_time IS NULL
+		AND DATE_FORMAT(create_time,'%Y-%m-%d %H:%i:%S') <![CDATA[<]]> DATE_FORMAT(DATE_SUB(NOW(),INTERVAL 15 MINUTE),'%Y-%m-%d %H:%i:%S')
+    </select>
+    
+    <!-- 查看是否为首次批改-->
+    <select id="selFirstSub" resultType="string" parameterType="teaSub">
+        SELECT count(1) FROM ke_first_sub 
+        WHERE teacher_id = #{teacherId}
+    </select>
+    
+    <!-- 插入首次批改记录-->
+    <insert id="insFirstSub" parameterType="teaSub">
+        INSERT INTO ke_first_sub(
+            teacher_id,subject_id,comment,create_time)
+        VALUES(
+            #{teacherId},#{subjectType},#{comment},NOW())
+    </insert>
+    
+    <!-- 查看存在的支付宝信息-->
+    <select id="zhiInfo" resultType="map" parameterType="teaSub">
+        SELECT toAccount AS toAccount,toName AS toName 
+        FROM ke_tea_income_record
+		WHERE teacher_id = #{teacherId}
+		AND result='S'
+		AND TYPE='1'
+		ORDER BY update_time DESC
+		LIMIT 0,1
+    </select>
+</mapper>

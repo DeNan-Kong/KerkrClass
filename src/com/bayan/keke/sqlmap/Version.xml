@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 查询当前的版本号-->
+<mapper namespace="ver">
+	<!-- 查询当前的版本号返回给前端  -->
+	<select id="getVersion" resultType="map" parameterType="ver">
+		SELECT versionNo AS versionNo,comment AS comment,forces AS forces,notice AS notice,download_url AS downloadUrl 
+		FROM ke_version WHERE type=#{type} and system_type=#{deviceType} ORDER BY versionNo DESC LIMIT 0,1
+	</select>
+</mapper>

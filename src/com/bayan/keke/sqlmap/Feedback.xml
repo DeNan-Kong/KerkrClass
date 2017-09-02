@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 插入用户反馈信息，及 用户名，用户数量-->
+<mapper namespace="feedback">
+	<!-- 问题反馈 -->
+	<insert id="insertQuestions" parameterType="feedback" useGeneratedKeys="true"
+		keyProperty="id">
+		insert
+		into ke_feedback
+		(user_id,content,type,create_time)
+		values
+		(#{userId},#{content},#{type},now())
+	</insert>
+	
+	<!-- 查找所有学生反馈信息数-->
+	<select id="queCnt" resultType="string">
+		SELECT COUNT(1) FROM ke_feedback
+	</select>
+	
+	<!-- 查找所有学生反馈信息 -->
+	<select id="questions" parameterType="map" resultType="map">
+		SELECT user_id AS userId,content AS content,DATE_FORMAT(create_time,'%Y-%m-%d') AS createTime 
+		FROM ke_feedback
+		WHERE type=#{type}
+		limit
+        #{page},#{size}
+	</select>
+</mapper>

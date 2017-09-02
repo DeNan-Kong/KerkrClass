@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sal">
+	<!-- 判断是否已注册  -->
+	<select id="salRegister" resultType="map" parameterType="sal">
+		SELECT * FROM ke_teacher WHERE teacher_id=#{phoneNumber}
+	</select>
+	
+	<!-- 用户注册 -->
+	<insert id="salInsert" parameterType="sal" useGeneratedKeys="true"
+		keyProperty="id">
+		INSERT INTO ke_teacher 
+			(teacher_id,teacher_name,sex,phone_number,password,grade,subject_id,head_url,
+			city_code,province_code,apprv_status,active_status,type,create_time) 
+		VALUE 
+			(#{phoneNumber},#{userName},#{sex},#{phoneNumber},#{password},#{grade},
+			#{subjectType},#{headUrl},#{cityCode},#{provinceCode},
+			#{approveStatus},#{activeStatus},#{type},NOW());
+		INSERT INTO ke_tea_income 
+			(teacher_id,total_income,input_income,output_income,create_time)
+		VALUE
+			(#{phoneNumber},'0','0','0',NOW());
+		INSERT INTO ke_promote_income 
+			(teacher_id,total_income,input_income,output_income,create_time)
+		VALUE
+			(#{phoneNumber},'0','0','0',NOW());
+		insert into ke_device
+			(device_id,user_id,system_type,flag,create_time)
+		values
+			(#{phoneNumber},#{phoneNumber},'0','1',now())
+		ON DUPLICATE KEY UPDATE
+		create_time=now()
+	</insert>
+	
+	<!-- 用户登录 -->
+	<select id="salLogin" resultType="map" parameterType="sal">
+		SELECT a.teacher_id AS teacherId,
+			a.teacher_name AS userName,
+			a.grade AS grade,
+			a.subject_id AS subjectType,
+			a.city_code AS cityCode,
+			a.province_code AS provinceCode,
+			b.general_key AS SIDCode,
+			COUNT(b.teacher_id) AS COUNT
+		FROM ke_teacher AS a
+		INNER JOIN ke_sid_info AS b
+		ON a.teacher_id = b.teacher_id
+		WHERE 
+			a.teacher_id=#{phoneNumber}
+		AND a.password=#{password}
+		GROUP BY SIDCode
+	</select>
+	
+	<!-- 验证码添加 -->
+	<insert id="insertCode" parameterType="sal" useGeneratedKeys="true"
+		keyProperty="id">
+		insert into ke_smslog
+		(phone_number,verify_code,create_time) 
+		values (#{phoneNumber},#{verifyCode},now())
+		ON DUPLICATE KEY UPDATE
+		verify_code=#{verifyCode},create_time=now()
+	</insert>
+	
+	<!-- 忘记密码，重置 -->
+	<update id="pwReset" parameterType="sal">
+		update ke_teacher
+		set password=#{password},update_time=now()
+		where teacher_id=#{phoneNumber}
+	</update>
+	
+	<!-- 老师信息修改  -->	
+	<update id="upSalInfo" parameterType="sal">
+		UPDATE ke_teacher
+		SET grade=#{grade},
+			subject_id=#{subjectType},
+			city_code=#{cityCode},
+			province_code=#{provinceCode},
+			update_time=NOW()
+		WHERE teacher_id=#{teacherId}
+	</update>
+	
+	<!-- 判断是否存在优惠码  -->
+	<select id="getSidCode" resultType="string" parameterType="sal">
+		SELECT discount_amount AS money 
+		FROM ke_code
+		WHERE key_code=#{SIDCode}
+	</select>
+	
+	<!-- 取得省List  -->
+	<select id="listProvince" resultType="sal" parameterType="string">
+		SELECT city_name AS province,city_code AS provinceCode FROM ke_city WHERE city_code%10000=0
+	</select>
+	
+	<!-- 根据省名来取得市List  -->
+	<select id="listCity" resultType="sal" parameterType="string">
+		SELECT city_name AS city,city_code AS cityCode
+		FROM ke_city 
+		WHERE city_code % 100 = 0 
+		AND city_code-#{cityCode}&lt;10000 
+		AND	city_code-#{cityCode}&gt;0
+	</select>
+	
+	<!-- 判断是否存在有效的SID码  -->
+	<select id="salSidCode" resultType="string" parameterType="sal">
+		SELECT discount_amount AS count
+		FROM ke_code
+		WHERE key_code=#{SIDCode}
+			AND STATUS='0'
+			AND code_type='1'
+			AND start_time &lt; NOW()
+ 			AND end_time &gt; NOW()
+	</select>
+	
+	<!-- SID码注册 -->
+	<insert id="salInsertSid" parameterType="sal" useGeneratedKeys="true"
+		keyProperty="id">
+		INSERT INTO ke_code 
+			(key_code,code_type,discount_amount,count_pay,create_time,status,start_time,end_time) 
+		VALUE 
+			(#{SIDCode},'1',#{money},#{count},NOW(),'0',now(),date_add(now(),interval 12 month));			
+		INSERT INTO ke_sid_info 
+			(general_key,teacher_id,count_pay,create_time) 
+		VALUE 
+			(#{SIDCode},#{phoneNumber},0,NOW())
+	</insert>
+	
+	<!-- SID码使用 -->
+	<update id="sidUse" parameterType="sal">
+		UPDATE ke_sid_info
+		SET count_pay = count_pay + 1
+		WHERE general_key = #{SIDCode}
+	</update>
+	
+	<!-- 判断是否已经有FID码的使用记录  -->
+	<select id="salFidCode" resultType="string" parameterType="sal">
+		SELECT a.count_pay AS count 
+		FROM ke_code a
+		WHERE a.key_code=#{SIDCode}
+		AND a.status='0'
+		AND a.code_type='0'
+		AND NOT EXISTS(
+				SELECT b.count_pay  
+				FROM ke_fid_info b
+				WHERE b.free_key=#{SIDCode}
+			)
+	</select>
+	
+	<!-- FID码使用记录插入 -->
+	<insert id="fidInsert" parameterType="sal" useGeneratedKeys="true"
+		keyProperty="id">
+		INSERT INTO ke_fid_info 
+			(free_key,user_id,count_pay,create_time) 
+		VALUE 
+			(#{SIDCode},#{userId},1,NOW())
+	</insert>
+	
+	
+	<!-- 查询优惠码对应的老师信息-->
+    <select id="getTeaInfo" resultType="string" parameterType="sal">
+		SELECT teacher_id AS teacherId FROM ke_sid_info WHERE general_key = #{SIDCode}
+	</select>
+	
+	<!-- 更新充推广后获得的金额 -->
+	<update id="promoteSetMoney" parameterType="sal">
+        UPDATE ke_promote_income
+		SET total_income=total_income + #{money},
+		    input_income=input_income + #{money},
+		    update_time=NOW()
+		WHERE teacher_id=#{teacherId}
+    </update>
+    
+    <!-- 插入支付记录 -->
+	<insert id="sidRecord" parameterType="sal" useGeneratedKeys="true"
+		keyProperty="id">
+		INSERT INTO ke_promote_income_record
+			(teacher_id,amount,TYPE,create_time)
+		VALUE
+			(#{teacherId},#{money},#{type},NOW())
+	</insert>
+	
+	<!-- 六一儿童节搞活动一个手机号只能优惠一次  -->
+	<select id="getSixOneMoney" resultType="string" parameterType="sal">
+		SELECT pay_money AS money 
+		FROM ke_pay_record
+		WHERE key_code=#{SIDCode}
+		AND user_id=#{userId}
+	</select>
+</mapper>

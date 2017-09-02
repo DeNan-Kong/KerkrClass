@@ -1,0 +1,369 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="subject">
+
+    <!-- 登陆作业信息-->
+    <insert id="insertTask" parameterType="subject" useGeneratedKeys="true"
+        keyProperty="id">
+        insert into ke_task
+        (
+	        user_id,
+	        photo_id,
+	        photo_sort,
+	        group_id,
+	        photo_url,
+	        width,
+	        height,
+	        task_status,
+	        subject_id,
+	        delete_flag,
+	        create_time) 
+        values (
+	        #{userId},
+	        #{photoId},
+	        #{photoSort},
+	        #{groupId},
+	        #{qiniuKey},
+	        #{width},
+	        #{height},
+	        #{taskStatus},
+	        #{subjectType},
+	        '0',
+	        now()
+        )
+    </insert>
+
+    <!-- 删除模糊图片-->
+    <update id="delBlurImgTask" parameterType="subject">
+        UPDATE ke_task
+        SET delete_flag='2'
+        WHERE photo_id=#{oldPhotoId}
+        and subject_id=#{subjectType}
+        and user_id=#{userId}
+    </update>
+    
+    <!-- 作业结果确认-->
+    <update id="confirmSubject" parameterType="subject">
+        UPDATE ke_task
+        SET point=#{result},
+        	task_status='CORRECTED'
+        WHERE user_id=#{userId}
+        and group_id=#{groupId}
+        and subject_id=#{subjectType}
+        and date_format(create_time,'%Y-%m-%d')=#{createTime}
+        and task_status IN ('UNCORRECTED','CORRECTING','FINISH')
+    </update>
+    
+    <!-- 日报请求-->
+    <select id="dayListSubject" parameterType="subject" resultType="daily">
+        SELECT a.task_status as taskStatus,
+	        a.create_time as createTime,
+	        a.update_time as updateTime,
+	        a.teacher_id as teacherId,
+	        a.photo_id as photoId,
+	        a.group_id as groupId,
+	        a.photo_url as photoUrl,
+	        a.comment as comment,
+	        a.width as width,
+	        a.height as height,
+	        b.result as result,
+	        b.position_x as pointx,
+	        b.position_y as pointy,
+	        b.reason as reason,
+	        b.direction as direction,
+	        c.teacher_name as teacherName,
+	        c.head_url as teacherHeadUrl
+        FROM
+        <if test="flg == 1">
+            ke_task_history a LEFT JOIN ke_mark_history b
+        </if>
+        <if test="flg != 1">
+            ke_task a LEFT JOIN ke_mark b
+        </if>
+        ON a.user_id=b.user_id and
+        a.photo_id = b.photo_id
+        LEFT JOIN ke_teacher c
+        ON a.teacher_id=c.teacher_id
+        WHERE a.user_id=#{userId}
+        and a.task_status in ('CORRECTED','INVALID','FINISH')
+        and a.delete_flag in ('0','1')
+        and date_format(a.create_time,'%Y-%m-%d')=#{createTime}
+        and a.subject_id=#{subjectType}
+        ORDER BY a.photo_id DESC
+    </select>
+    
+    <!-- 更新学分-->
+    <update id="updatePointAll" parameterType="subject">
+        UPDATE ke_point
+        SET point_all=point_all+#{pointAll},
+        update_time=now()
+        WHERE user_id=#{userId}
+    </update>
+    
+    <!-- 获取题目对错 -->
+    <select id="getErrorCount" parameterType="subject" resultType="map">
+        SELECT a.teacher_id as teacherId,
+            a.photo_id as photoId,
+        	b.result as result
+        FROM ke_task a
+        INNER JOIN ke_mark b
+        ON a.user_id=b.user_id and
+        a.photo_id = b.photo_id
+        WHERE a.user_id=#{userId}
+        and (a.task_status='CORRECTED' or a.task_status='FINISH')
+        and date_format(a.create_time,'%Y-%m-%d')=#{createTime}
+        and a.subject_id=#{subjectType}
+        and a.delete_flag='0'
+        ORDER BY a.photo_id
+    </select>
+    
+    <!-- 作业结果确认-->
+    <update id="upConfirmStatus" parameterType="subject">
+        UPDATE ke_task
+        SET mark_flag='1'
+        WHERE user_id=#{userId}
+        and group_id=#{groupId}
+        and subject_id=#{subjectType}
+        and date_format(create_time,'%Y-%m-%d')=#{createTime}
+        and task_status='CORRECTED'
+        and delete_flag='0'
+        and mark_flag='0'
+    </update>
+    
+    <!-- 获取已经上传件数 -->
+    <select id="getPhotoCount" parameterType="subject" resultType="int">
+        SELECT count(1)
+        FROM ke_task a
+        WHERE a.user_id=#{userId}
+        and date_format(a.create_time,'%Y-%m-%d')=#{createTime}
+        and a.subject_id=#{subjectType}
+        and a.delete_flag='0'
+    </select>
+    
+        <!-- 本周疑难-->
+    <select id="thisWeekList" parameterType="subject" resultType="weekInfo">
+        SELECT 
+            SUM(a.resolvedFlag) AS countError,
+            DATE_FORMAT(b.create_time,'%Y-%m-%d') as date,
+            CASE WEEKDAY(b.create_time)
+            WHEN '0' THEN 'Monday'
+            WHEN '1' THEN 'Tuesday'
+            WHEN '2' THEN 'Wednesday'
+            WHEN '3' THEN 'Thursday'
+            WHEN '4' THEN 'Friday'
+            WHEN '5' THEN 'Saturday'
+            WHEN '6' THEN 'Sunday' END AS week
+        FROM
+            ke_mark a
+        INNER JOIN ke_task b
+        ON a.user_id = b.user_id
+        and a.photo_id=b.photo_id
+        WHERE
+            b.create_time BETWEEN #{firstDayOfWeek} AND #{lastDayOfWeek}
+            and b.subject_id = #{subjectType}
+            and b.user_id=#{userId}
+            AND NOT EXISTS(
+				SELECT c.photo_id FROM ke_task c
+				WHERE c.user_id = b.user_id
+				AND c.subject_id = #{subjectType} 
+				AND c.task_status IN ('UNCORRECTED','CORRECTING')
+				AND DATE_FORMAT(c.create_time,'%Y-%m-%d') = DATE_FORMAT(b.create_time,'%Y-%m-%d')
+            )
+        	and b.delete_flag in ('0','2')
+        GROUP BY
+            DATE_FORMAT(b.create_time,'%Y-%m-%d')
+        ORDER BY
+            DATE_FORMAT(b.create_time,'%Y-%m-%d') DESC
+    </select>
+    
+    <!-- 历史周疑难-->
+    <select id="historyWeekList" parameterType="subject" resultType="historyInfo">
+        SELECT 
+            SUM(a.resolvedFlag) AS countError,
+            DATE_FORMAT(b.create_time,'%Y-%m-%d') as date
+        FROM
+            ke_mark a
+        INNER JOIN ke_task b
+        ON a.user_id = b.user_id
+        and a.photo_id=b.photo_id
+        WHERE
+            b.create_time &lt; #{firstDayOfWeek}
+            and b.subject_id = #{subjectType}
+            and b.user_id=#{userId}
+            AND NOT EXISTS(
+				SELECT c.photo_id FROM  ke_task c
+				WHERE c.user_id = b.user_id
+				AND c.subject_id = #{subjectType} 
+				AND c.task_status IN ('UNCORRECTED','CORRECTING')
+				AND DATE_FORMAT(c.create_time,'%Y-%m-%d') = DATE_FORMAT(b.create_time,'%Y-%m-%d')
+            )
+        	and b.delete_flag in ('0','2')
+        GROUP BY
+            DATE_FORMAT(b.create_time,'%Y-%m-%d')
+        ORDER BY
+            DATE_FORMAT(b.create_time,'%Y-%m-%d') DESC
+        LIMIT #{selectIndex},#{selectCount}
+    </select>
+    
+    <!-- 已解决-->
+    <update id="resolved" parameterType="subject">
+        UPDATE ke_mark AS a
+        INNER JOIN ke_task b
+        ON a.user_id = b.user_id
+        and a.photo_id=b.photo_id
+        SET a.resolvedFlag='0'
+        WHERE
+        date_format(b.create_time,'%Y-%m-%d') = #{createTime}
+        and b.subject_id = #{subjectType}
+        and b.user_id=#{userId}
+        and b.delete_flag='0'
+    </update>
+    
+    <!-- 未批改完成作业统计-->
+    <select id="selUncorrected" parameterType="subject" resultType="int">
+        SELECT count(1)
+        FROM ke_task
+        WHERE user_id=#{userId}
+        and subject_id = #{subjectType}
+        and delete_flag='0'
+        and task_status IN ('UNCORRECTED','CORRECTING')
+        and date_format(create_time,'%Y-%m-%d')=#{createTime}
+    </select>
+    
+    <!-- 作业已确认完成统计-->
+    <select id="selCorrected" parameterType="subject" resultType="int">
+        SELECT count(1)
+        FROM ke_task
+        WHERE user_id=#{userId}
+        and subject_id = #{subjectType}
+        and delete_flag='0'
+        and task_status = 'CORRECTED'
+        and date_format(create_time,'%Y-%m-%d')=#{createTime}
+    </select>
+    
+    <!-- 获取批改完成，没有评分的作业-->
+    <select id="getNoPointUser" resultType="subject">
+        SELECT user_id AS userId,
+        	subject_id AS subjectType,
+        group_id AS groupId,
+        teacher_id AS teacherId,
+        DATE_FORMAT(create_time,'%Y-%m-%d') AS createTime
+        FROM ke_task a
+        WHERE a.point IS NULL
+        AND task_status='FINISH'
+        AND DATE_FORMAT(update_time,'%Y-%m-%d')=ADDDATE(DATE_FORMAT(NOW(),'%Y-%m-%d'),INTERVAL -1 DAY) 
+        ORDER BY group_id
+    </select>
+    
+    <!-- 若学生不提交评分，则该组作业状态在次日12:00会自动评为5颗星-->
+    <update id="autoSetPoint">
+        UPDATE ke_task
+        SET task_status='CORRECTED',
+        	point='5'
+        WHERE point IS NULL
+        AND task_status='FINISH'
+        AND DATE_FORMAT(update_time,'%Y-%m-%d')=ADDDATE(DATE_FORMAT(NOW(),'%Y-%m-%d'),INTERVAL -1 DAY)
+        ORDER BY group_id
+    </update>
+    
+    <!-- 若学生不提交评分，则该组作业状态在次日12:00会自动评为5颗星,给老师加1快钱-->
+    <update id="autoSetMoney" parameterType="subject">
+           UPDATE ke_tea_income
+           SET total_income=total_income + 1,
+           	   input_income=input_income + 1,
+           update_time=now()
+           WHERE teacher_id=#{teacherId}
+    </update>
+    
+    <!-- 学生确认后,给老师加1快钱-->
+    <update id="addConfirmMoney" parameterType="subject">
+           UPDATE ke_tea_income
+           SET total_income=total_income + 1,
+           	   input_income=input_income + 1,
+           update_time=now()
+           WHERE teacher_id=#{teacherId}
+    </update>
+    
+    <!-- 获取图片信息 -->
+    <select id="getPhotoInfo" parameterType="subject" resultType="subject">
+        select 
+            user_id AS userId,
+            photo_id AS photoId,
+            photo_sort AS photoSort 
+        from 
+            ke_task
+        where 
+            user_id=#{userId}
+            and photo_id=#{photoId}
+            and subject_id=#{subjectType}
+    </select>
+
+    <!-- 取得当天学生作业的指定科目的状态 -->
+    <select id="getStatus" parameterType="subject" resultType="subject">
+       SELECT task_status as taskStatus 
+       FROM ke_task 
+       WHERE user_id=#{userId}
+       AND subject_id = #{subjectType}
+       AND DATE_FORMAT(create_time,'%Y-%m-%d') = DATE_FORMAT(NOW(),'%Y-%m-%d')
+       AND delete_flag IN ('0','1')
+       ORDER BY create_time
+    </select>
+    
+    <!-- 添加老师收支记录-->
+    <insert id="insTeaIncomeRcd" parameterType="teaIncomeRcd">
+        INSERT INTO ke_tea_income_record(teacher_id,amount,type,create_time)
+        VALUES(#{teacherId},#{amount},#{type},NOW())
+    </insert>
+    
+    <!-- 查询老师类型与设备ID-->
+    <select id="selDevices" resultType="string" parameterType="map">
+        SELECT b.device_id
+        FROM ke_teacher a
+        INNER JOIN ke_device b
+        ON a.teacher_id = b.user_id
+        WHERE a.org_id = (SELECT org_id FROM ke_user WHERE user_id=#{userId})
+        AND b.device_id IS NOT NULL
+        AND b.device_id <![CDATA[<>]]> 'nodeviceid'
+        AND b.flag='1'
+    </select>
+    
+    <!-- 取得当天学生作业的指定科目的所有pohotoId -->
+    <select id="getPhotos" parameterType="subject" resultType="string">
+       SELECT photo_id as photoId 
+       FROM ke_task 
+       WHERE user_id=#{userId}
+        and group_id=#{groupId}
+        and subject_id=#{subjectType}
+        and date_format(create_time,'%Y-%m-%d')=#{createTime}
+        and task_status IN ('UNCORRECTED','CORRECTING','FINISH')
+    </select>
+    
+    <!-- 单张作业结果确认-->
+    <update id="confirmOne" parameterType="subject">
+        UPDATE ke_task
+        SET point=#{result},
+        	task_status='CORRECTED'
+        WHERE user_id=#{userId}
+        and group_id=#{groupId}
+        and subject_id=#{subjectType}
+        and date_format(create_time,'%Y-%m-%d')=#{createTime}
+        and task_status IN ('UNCORRECTED','CORRECTING','FINISH')
+        and photo_id=#{photoId}
+    </update>
+
+    <!-- 添加分享日报记录-->
+    <insert id="insShareInfo" parameterType="subject">
+        INSERT INTO ke_html (share_id,user_id,subject_type,share_time,create_time,update_time)
+        VALUES(#{shareId},#{userId},#{subjectType},#{createTime},NOW(),NOW())
+    </insert>
+
+    <!-- 获取当天有效批改件数 -->
+    <select id="getUploadCount" parameterType="subject" resultType="int">
+        SELECT count(1)
+        FROM ke_task a
+        WHERE a.user_id=#{userId}
+        and DATE_FORMAT(create_time,'%Y-%m-%d') = DATE_FORMAT(NOW(),'%Y-%m-%d')
+        and a.subject_id=#{subjectType}
+        and a.task_status='CORRECTED'
+    </select>
+</mapper>
