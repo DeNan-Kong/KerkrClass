@@ -51,33 +51,69 @@ public class VideosAction extends BaseAction implements
 
 
     /**
-     * 上传视频token，发布正式版需要更换QINIU_BUCKET
+     * 上传视频token，发布正式版需要更换 QINIU_BUCKET
      * clientUpload
      * @return 返回上传token
      */
     public void getToken() {
         //跨域
         getResponse().setHeader("Access-Control-Allow-Origin","*");
+
         if (!CheckUtil.isNullOrEmpty(
                 getSession().getAttribute("userId"))
                 ) {
             auth = Auth.create(KeCommon.ACCESS_KEY, KeCommon.SECRET_KEY);
+            String userId = String.valueOf(getSession().getAttribute("userId"));
+            String key = KeCommon.createKey(userId);//bucket：key形式是用来限制客户端上传的名字必须和服务端一致才可以。
+
             StringMap putPolicy = new StringMap();
-            putPolicy.put("callbackUrl", "http://ovhr8lih9.bkt.clouddn.com/callback");
-            putPolicy.put("callbackBody", "{\"key\":\"$(key)\",\"hash\":\"$(etag)\",\"bucket\":\"$(bucket)\",\"fsize\":$(fsize)}");
-            putPolicy.put("callbackBodyType", "application/json");
+            //putPolicy.put("callbackUrl", getRequest().getContextPath()+ "/uploadCallBackVideos.jspx");
+            putPolicy.put("returnBody", "{\"key\":\"$(key)\",\"hash\":\"$(etag)\",\"bucket\":\"$(bucket)\",\"fsize\":$(fsize)}");
+            //putPolicy.put("callbackBody ", "{\"key\":\"$(key)\",\"hash\":\"$(etag)\",\"bucket\":\"$(bucket)\",\"fsize\":$(fsize)}");
+            //putPolicy.put("callbackBodyType", "application/json");
+            //putPolicy.putNotEmpty("saveKey",key);
             long expireSeconds = 3600;
-            //String upToken = auth.uploadToken(KeCommon.QINIU_VIDEO_BUCKET, null, expireSeconds, putPolicy);
-            String upToken = auth.uploadToken(KeCommon.QINIU_VIDEO_BUCKET);
-            print("{\"uptoken\":\""+ upToken +"\"}");
+            String upToken = auth.uploadToken(KeCommon.QINIU_VIDEO_BUCKET, null, expireSeconds, putPolicy);
+            //String upToken = auth.uploadToken(KeCommon.QINIU_VIDEO_BUCKET);
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.element("uptoken",upToken);
+            print(jsonObject);
         }
-
     }
 
-    public void uploadCallBack(){
+    /**
+     * 七牛云视频信息持久化数据库
+     * by kdn
+     */
+    public void uploadCallBack() {
+        printStartLog("视频上传信息回调方法开始", logger);
 
+        try{
+            if (CheckUtil.checkNulls(
+                    keVideos.getOrgId(),
+                    keVideos.getVideoUrl(),
+                    keVideos.getTitle())){
+                printErrorLog("参数异常！",logger);
+            }else{
+                String topicImgUrl = keVideos.getVideoUrl() + "?vframe/jpg/offset/7";//截取第七帧
+                keVideos.setTopicImg(topicImgUrl);
+                boolean res = videosService.saveVideoInfo(keVideos);
+                JSONObject j = new JSONObject();
+                j.element("result",res);
+                j.element("message","call back videos info result!");
+                print(j);
+
+            }
+
+        }catch (Exception e) {
+            printSysErr(e, logger);
+        }
     }
 
+    /**
+     * android & ios 获取接口
+     * by kdn
+     */
     public void getInfo() {
         printStartLog("获取视频列表方法开始", logger);
         if (CheckUtil.checkNulls(
@@ -88,6 +124,16 @@ public class VideosAction extends BaseAction implements
         } else {
             try {
                 List<Map> videosList = videosService.getVideosInfo(keVideos);
+                for(Map m: videosList){
+                    if(m.containsKey("videoUrl") ){
+                        String qiniuUrl = KeCommon.getPubURL(m.get("videoUrl").toString());
+                        m.put("videoUrl",qiniuUrl);
+                    }
+                    if(m.containsKey("topicImg") ){
+                        String qiniuUrl = KeCommon.getPubURL(m.get("topicImg").toString());
+                        m.put("topicImg",qiniuUrl);
+                    }
+                }
                 JSONObject json = new JSONObject();
                 json.element("code", 1000);
                 json.element("videoList", JSONArray.fromObject(videosList));
@@ -100,11 +146,13 @@ public class VideosAction extends BaseAction implements
         }
     }
 
+    /**
+     * java sever upload to qi-niu
+     * by kdn
+     */
     public void serverUpload() {
         //构造一个带指定Zone对象的配置类
         Configuration cfg = new Configuration(Zone.zone0());
-        /*Auth auth = Auth.create(KeCommon.ACCESS_KEY, KeCommon.SECRET_KEY);
-        String upToken = auth.uploadToken(KeCommon.QINIU_VIDEO_BUCKET);*/
         String upToken = getUpToken();
         //本地断点路径
         String localFilePath = "C:\\compositions\\12.jpg";
