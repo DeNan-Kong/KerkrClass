@@ -3,6 +3,13 @@
     <output-path>$PROJECT_DIR$/out/artifacts/KerkrClass0829_war</output-path>
     <root id="archive" name="KerkrClass0829_war.war">
       <element id="artifact" artifact-name="KerkrClass0829:war exploded" />
+      <element id="directory" name="WEB-INF">
+        <element id="directory" name="lib">
+          <element id="file-copy" path="$PROJECT_DIR$/web/WEB-INF/lib/qiniu-java-sdk-7.2.7.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/web/WEB-INF/lib/okio-1.13.0.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/web/WEB-INF/lib/okhttp-3.8.1.jar" />
+        </element>
+      </element>
     </root>
   </artifact>
 </component>

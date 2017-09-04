@@ -23,7 +23,7 @@ public class KeVideos implements java.io.Serializable {
     /**
      * 时长
      */
-    private String length;
+    private Integer length;
     /**
      * 视频七牛key
      */
@@ -49,6 +49,8 @@ public class KeVideos implements java.io.Serializable {
 
     private Integer size;
 
+    private String hash;
+
     public Integer getId() {
         return id;
     }
@@ -73,11 +75,11 @@ public class KeVideos implements java.io.Serializable {
         this.topicImg = topicImg;
     }
 
-    public String getLength() {
+    public Integer getLength() {
         return length;
     }
 
-    public void setLength(String length) {
+    public void setLength(Integer length) {
         this.length = length;
     }
 
@@ -155,5 +157,13 @@ public class KeVideos implements java.io.Serializable {
 
     public KeVideos() {
 
+    }
+
+    public String getHash() {
+        return hash;
+    }
+
+    public void setHash(String hash) {
+        this.hash = hash;
     }
 }

@@ -31,6 +31,8 @@
                       name="description"
                       placeholder="请输入标题"/>
         </div>
+        <input type="hidden" value="${sessionScope.userId}" id="orgId">
+        <input type="hidden" value="${requestScope.domain}" id="domain">
     </div>
 
     <div class="col-md-12">
@@ -40,12 +42,12 @@
                 <span>选择文件</span>
             </a>
 
-            <a class="btn btn-default " id="up_load" style="width:160px;margin-right:50px" href="#">
+            <a class="btn btn-default " id="up_load" style="width:160px;margin-right:50px" >
                 <span>确认上传</span>
             </a>
 
-            <a class="btn btn-default  " id="retry" style="width:160px;margin-right:50px" href="#">
-                <span>重新上传</span>
+            <a class="btn btn-default  " id="stop_load" style="width:160px;margin-right:50px">
+                <span>暂停上传</span>
             </a>
         </div>
     </div>
@@ -85,5 +87,31 @@
 <script type="text/javascript" src="${ctx}/js/qiniu/ui.js"></script>
 <script type="text/javascript" src="${ctx}/js/qiniu/highlight.js"></script>
 <script type="text/javascript" src="${ctx}/js/qiniu/main.js"></script>
+<script>
+    function abc() {
+        var data = {
+            "orgId":$('#orgId').val(),
+            "title": $('#title').val(),
+            "description": $('#description').val(),
+            "videoUrl":"1",
+            "hash": "2",
+            "length": "3"
+        }
+        $.ajax({
+            url:'uploadCallBackVideos.jspx',
+            type:'POST', //GET
+            async:false,    //或false,是否异步
+            data: data,
+            timeout:5000,    //超时时间
+            dataType:'json',    //返回的数据格式：json/xml/html/script/jsonp/text
+            success:function(data,textStatus,jqXHR){
+                console.log(data)
+                console.log(textStatus)
+                console.log(jqXHR)
+            }
+        })
+    }
+
+</script>
 </body>
 </html>

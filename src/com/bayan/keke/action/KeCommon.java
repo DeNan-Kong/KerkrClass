@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -62,11 +63,13 @@ public class KeCommon {
     //极光推送测试环境
     private static final boolean APNS_PRODUCTION = false;
     /* 七牛作业域名*/
-    private static final String QINIU_URL = "http://testqiniu.kerkr.com";
+    public static final String QINIU_URL = "http://testqiniu.kerkr.com";
     // 七牛作业空间
     public static final String QINIU_BUCKET = "testkerkr";
 	// 七牛视频空间
     public static final String QINIU_VIDEO_BUCKET = "test-class-video";
+    // 七牛视频域名
+    public static final String QINIU_VIDEO_DOMIN = "http://ovhr8lih9.bkt.clouddn.com/";
     /* 七牛域名:头像*/
     private static final String QINIU_HEAD = "http://testqiniu.kerkr.com";
     // 七牛空间:头像
@@ -74,16 +77,20 @@ public class KeCommon {
     /** ==========课课小教室测试环境====end=============*/
     
     /** ==========课课小教室发布环境====start===========*/
-//    //极光推送发布环境
-//    private static final boolean APNS_PRODUCTION = true;
-//    /* 七牛作业域名*/
-//    private static final String QINIU_URL = "http://workclass.kerkr.com";
-//    // 七牛空间
-//    public static final String QINIU_BUCKET = "workclass";
-//    /* 七牛域名:头像*/
-//    private static final String QINIU_HEAD = "http://headclass.kerkr.com";
-//    // 七牛空间:头像
-//    public static final String QINIU_BUCKET_HEADURL = "headclass";
+    /*//极光推送发布环境
+    private static final boolean APNS_PRODUCTION = true;
+	//七牛作业域名
+    public static final String QINIU_URL = "http://workclass.kerkr.com";
+    // 七牛空间
+    public static final String QINIU_BUCKET = "workclass";
+	// 七牛视频空间
+	public static final String QINIU_VIDEO_BUCKET = "test-class-video";
+	// 七牛视频域名
+	public static final String QINIU_VIDEO_DOMIN = "http://ovhr8lih9.bkt.clouddn.com/";
+	//七牛域名:头像
+    private static final String QINIU_HEAD = "http://headclass.kerkr.com";
+    // 七牛空间:头像
+    public static final String QINIU_BUCKET_HEADURL = "headclass";*/
     /** ==========课课小教室发布环境====end=============*/
     
     //==================================================================================//
@@ -173,7 +180,7 @@ public class KeCommon {
     /**
      * 获取学分
      * @param countRight
-     * @param countError
+     *
      * @return
      */
     public static Integer getPoint(int countRight,int total){
@@ -236,7 +243,7 @@ public class KeCommon {
      * @param alias 别名
      * @param alert
      * @param msgContent
-     * @param setApnsProduction:true发布环境、false测试环境
+     * @param :true发布环境、false测试环境
      * @return
      * @throws APIConnectionException
      * @throws APIRequestException
@@ -281,7 +288,7 @@ public class KeCommon {
      * @param alias 别名
      * @param alert
      * @param msgContent
-     * @param setApnsProduction:true发布环境、false测试环境
+     * @param :true发布环境、false测试环境
      * @return
      * @throws APIConnectionException
      * @throws APIRequestException
@@ -327,7 +334,7 @@ public class KeCommon {
 	 * @param alias 别名
 	 * @param alert
 	 * @param msgContent
-	 * @param setApnsProduction:true发布环境、false测试环境
+	 * @param :true发布环境、false测试环境
 	 * @return
 	 * @throws APIConnectionException
 	 * @throws APIRequestException
@@ -774,5 +781,20 @@ public class KeCommon {
 		//取得老师评分
 		String score = String.valueOf(scoreInt);
 		return score;
+	}
+
+	/**
+	 * 获取公开空间七牛云URL
+	 * by kdn
+	 */
+	public static String getPubURL(String fileName){
+		String encodedFileName = null;
+		try {
+			encodedFileName = URLEncoder.encode(fileName, "utf-8");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		String finalUrl = String.format("%s/%s", QINIU_VIDEO_DOMIN, encodedFileName);
+		return finalUrl;
 	}
 }

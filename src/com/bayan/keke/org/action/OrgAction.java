@@ -6,6 +6,7 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import com.bayan.keke.action.KeCommon;
 import org.apache.log4j.Logger;
 
 import com.bayan.keke.base.BaseAction;
@@ -801,6 +802,7 @@ public class OrgAction extends BaseAction implements
 	 * @return
 	 */
 	public String toUploadVieo(){
+		getRequest().setAttribute("domain",KeCommon.QINIU_VIDEO_DOMIN);
 		return "toUploadVieo";
 	}
 }

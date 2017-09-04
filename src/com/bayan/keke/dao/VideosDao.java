@@ -19,4 +19,8 @@ public class VideosDao extends BaseDao {
     public String getOrgId(String userId) throws Exception{
         return getSqlSession().selectOne("videos.getOrgId",userId);
     }
+
+    public Integer saveVideoInfo(KeVideos keVideos) throws Exception{
+        return getSqlSession().insert("videos.saveVideoInfo",keVideos);
+    }
 }

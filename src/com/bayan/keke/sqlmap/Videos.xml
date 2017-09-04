@@ -21,4 +21,11 @@
         SELECT org_id AS orgId
         FROM ke_user WHERE user_id = #{userId}
     </select>
+    <!--保存视频信息-->
+    <insert id="saveVideoInfo" parameterType="com.bayan.keke.vo.KeVideos" useGeneratedKeys="true" keyProperty="id" >
+        INSERT INTO ke_videos
+        (org_id,topic_img,length,video_url,create_time,status,title,description,hash_code)
+        VALUES
+        (#{orgId},#{topicImg},#{length},#{videoUrl},now(),1,#{title},#{description},#{hash})
+    </insert>
 </mapper>

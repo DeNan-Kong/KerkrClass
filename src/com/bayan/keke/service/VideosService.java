@@ -22,4 +22,12 @@ public class VideosService {
 		return videosDao.getVideosInfo(keVideos);
 	}
 
+	public Boolean saveVideoInfo(KeVideos keVideos) throws Exception{
+		int res = videosDao.saveVideoInfo(keVideos);
+		if(res > 0)
+			return true;
+		else
+			return false;
+	}
+
 }
