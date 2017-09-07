@@ -12,7 +12,7 @@ function createGridVideos() {
         striped : true,
         fit : true,
         queryParams : {
-            'orgId' : "K20013",
+            'orgId' : $("#orgId").val(),
         },
         rowNumbers: true,
         loadMsg : '正在努力为您查找中……',

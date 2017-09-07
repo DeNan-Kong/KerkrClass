@@ -45,6 +45,7 @@
                 </div>
             </div>
             <input type="hidden" name="id" id="k-id"/>
+            <input type="hidden" id="orgId" value="${sessionScope.userId}"/>
 
             <div class="form-group">
                 <input id="update" type="button" class="btn btn-default " onclick=""

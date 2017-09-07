@@ -200,7 +200,7 @@ public class VideosAction extends BaseAction implements
         printStartLog("getListToWeb方法开始", logger);
         printParamsLog("getListToWeb查询处理参数:", logger);
         //分页参数
-        int start = (getPage()) * getRows();
+        int start = (getPage() ) * getRows();
         keVideos.setPage(start);
         keVideos.setSize(getRows());
 

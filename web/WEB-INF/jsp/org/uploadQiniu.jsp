@@ -42,12 +42,12 @@
             <label style="text-align: center;width:100px; display:inline-block" for="k-grade">年级</label>
             <div class="dropdown" style="width:500px; display:inline-block">
                 <select id="k-grade" name="k-grade" class="show-tick form-control ">
-                    <option value="一年级">一年级</option>
-                    <option value="二年级">二年级</option>
-                    <option value="三年级">三年级</option>
-                    <option value="四年级">四年级</option>
-                    <option value="五年级">五年级</option>
-                    <option value="六年级">六年级</option>
+                    <option value="01">一年级</option>
+                    <option value="02">二年级</option>
+                    <option value="03">三年级</option>
+                    <option value="04">四年级</option>
+                    <option value="05">五年级</option>
+                    <option value="06">六年级</option>
                 </select>
             </div>
         </div>

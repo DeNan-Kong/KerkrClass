@@ -43,7 +43,7 @@ public class KeVideos implements java.io.Serializable {
     /**
      * 1,显示 2，不显示
      */
-    private Boolean status;
+    private Integer status;
     /**
      * 登入用户id
      */
@@ -135,11 +135,11 @@ public class KeVideos implements java.io.Serializable {
         this.description = description;
     }
 
-    public Boolean getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(Boolean status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 
