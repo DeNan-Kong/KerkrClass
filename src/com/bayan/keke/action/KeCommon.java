@@ -60,9 +60,9 @@ public class KeCommon {
     public static final String DELIMITER = "/";
     
     /** ==========课课小教室测试环境====start===========*/
-    //极光推送测试环境
+   /* //极光推送测试环境
     private static final boolean APNS_PRODUCTION = false;
-    /* 七牛作业域名*/
+    *//* 七牛作业域名*//*
     public static final String QINIU_URL = "http://testqiniu.kerkr.com";
     // 七牛作业空间
     public static final String QINIU_BUCKET = "testkerkr";
@@ -70,14 +70,14 @@ public class KeCommon {
     public static final String QINIU_VIDEO_BUCKET = "test-class-video";
     // 七牛视频域名
     public static final String QINIU_VIDEO_DOMIN = "http://ovhr8lih9.bkt.clouddn.com/";
-    /* 七牛域名:头像*/
+    *//* 七牛域名:头像*//*
     private static final String QINIU_HEAD = "http://testqiniu.kerkr.com";
     // 七牛空间:头像
-    public static final String QINIU_BUCKET_HEADURL = "testkerkr";
+    public static final String QINIU_BUCKET_HEADURL = "testkerkr";*/
     /** ==========课课小教室测试环境====end=============*/
     
     /** ==========课课小教室发布环境====start===========*/
-    /*//极光推送发布环境
+    //极光推送发布环境
     private static final boolean APNS_PRODUCTION = true;
 	//七牛作业域名
     public static final String QINIU_URL = "http://workclass.kerkr.com";
@@ -90,7 +90,7 @@ public class KeCommon {
 	//七牛域名:头像
     private static final String QINIU_HEAD = "http://headclass.kerkr.com";
     // 七牛空间:头像
-    public static final String QINIU_BUCKET_HEADURL = "headclass";*/
+    public static final String QINIU_BUCKET_HEADURL = "headclass";
     /** ==========课课小教室发布环境====end=============*/
     
     //==================================================================================//
@@ -789,12 +789,15 @@ public class KeCommon {
 	 */
 	public static String getPubURL(String fileName){
 		String encodedFileName = null;
-		try {
+		/*try {
 			encodedFileName = URLEncoder.encode(fileName, "utf-8");
+			String finalUrl =  QINIU_VIDEO_DOMIN + encodedFileName;
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
-		}
-		String finalUrl = String.format("%s/%s", QINIU_VIDEO_DOMIN, encodedFileName);
-		return finalUrl;
+		}*/
+		StringBuilder videoUrl = new StringBuilder();
+		videoUrl.append(QINIU_VIDEO_DOMIN);
+		videoUrl.append(fileName);
+		return videoUrl.toString();
 	}
 }

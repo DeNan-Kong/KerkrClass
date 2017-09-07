@@ -14,7 +14,7 @@
             <span style="width: 332px;height: 40px;font-size:25px;color: #64CDBD;">老师信息</span>
         </div>
         <div class="col-md-6" style="height: 70%; width: 100%;">
-            <div id="teh_grid" style="height: 20%; width: 70%; float: center;"></div>
+            <div id="teh_grid" style="height: 20%; width: 70%; float: left;"></div>
         </div>
     </body>
 </html>

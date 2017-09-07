@@ -17,8 +17,15 @@ public class VideosService {
 	private VideosDao videosDao;
 
 	public List<Map> getVideosInfo(KeVideos keVideos) throws Exception{
-		String orgId = videosDao.getOrgId(keVideos.getUserId());
-		keVideos.setOrgId(orgId);
+		KeVideos videos = videosDao.getOrgId(keVideos.getUserId());
+		if(videos.getOrgId() != null & videos.getGrade() != null){
+			keVideos.setOrgId(videos.getOrgId());
+			keVideos.setGrade(videos.getGrade());
+		}
+		return videosDao.getVideosInfo(keVideos);
+	}
+
+	public List<Map> getVideosToWeb(KeVideos keVideos) throws Exception{
 		return videosDao.getVideosInfo(keVideos);
 	}
 
@@ -30,4 +37,29 @@ public class VideosService {
 			return false;
 	}
 
+	public Boolean deleteByStatus(KeVideos keVideos) throws Exception{
+		int res = videosDao.deleteByStatus(keVideos);
+		if(res > 0)
+			return true;
+		else
+			return false;
+	}
+
+	/**
+	 * 更新Videos info
+	 * @param keVideos
+	 * @return
+	 * @throws Exception
+	 */
+	public Boolean updateInfo(KeVideos keVideos) throws Exception{
+		int res = videosDao.updateInfo(keVideos);
+		if(res > 0)
+			return true;
+		else
+			return false;
+	}
+
+	public Integer countVideos(KeVideos keVideos) throws Exception{
+		return videosDao.countVideos(keVideos);
+	}
 }

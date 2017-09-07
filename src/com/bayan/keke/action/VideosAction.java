@@ -24,6 +24,7 @@ import org.apache.log4j.Logger;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Map;
 
@@ -68,7 +69,7 @@ public class VideosAction extends BaseAction implements
 
             StringMap putPolicy = new StringMap();
             //putPolicy.put("callbackUrl", getRequest().getContextPath()+ "/uploadCallBackVideos.jspx");
-            putPolicy.put("returnBody", "{\"key\":\"$(key)\",\"hash\":\"$(etag)\",\"bucket\":\"$(bucket)\",\"fsize\":$(fsize)}");
+            putPolicy.put("returnBody", "{\"key\":\"$(key)\",\"hash\":\"$(etag)\",\"bucket\":\"$(bucket)\",\"fsize\":\"$(fsize)\",\"ext\":\"$(ext)\",\"length\":$(avinfo.video.duration)}");
             //putPolicy.put("callbackBody ", "{\"key\":\"$(key)\",\"hash\":\"$(etag)\",\"bucket\":\"$(bucket)\",\"fsize\":$(fsize)}");
             //putPolicy.put("callbackBodyType", "application/json");
             //putPolicy.putNotEmpty("saveKey",key);
@@ -140,6 +141,97 @@ public class VideosAction extends BaseAction implements
 
                 print(json.toString());
                 printEndLog("获取视频列表方法结束", json.toString(), logger);
+            } catch (Exception e) {
+                printSysErr(e, logger);
+            }
+        }
+    }
+
+    /**
+     * by kdn
+     */
+    public void delete() {
+        printStartLog("delete方法开始", logger);
+        try {
+            if (CheckUtil.isNullOrEmpty(
+                    keVideos.getId())) {
+                print("{\"code\":\"1005\",\"message\":\"参数异常\"}");
+                printErrorLog("传入的参数为空值,请参考参数日志", logger);
+            } else {
+                boolean res = videosService.deleteByStatus(keVideos);
+                JSONObject json = new JSONObject();
+                json.element("code", 1000);
+                json.element("message", res);
+                print(json);
+            }
+        } catch (Exception e) {
+            printSysErr(e, logger);
+        }
+
+    }
+
+    /**
+     * by kdn
+     */
+    public void update() {
+        printStartLog("update方法开始", logger);
+        try {
+            if (CheckUtil.isNullOrEmpty(
+                    keVideos.getId())) {
+                print("{\"code\":\"1005\",\"message\":\"参数异常\"}");
+                printErrorLog("传入的参数为空值,请参考参数日志", logger);
+            } else {
+                boolean res = videosService.updateInfo(keVideos);
+                JSONObject json = new JSONObject();
+                json.element("code", 1000);
+                json.element("message", res);
+                print(json);
+            }
+        } catch (Exception e) {
+            printSysErr(e, logger);
+        }
+
+    }
+
+    /**
+     * by kdn 170906
+     */
+    public void getListToWeb(){
+        printStartLog("getListToWeb方法开始", logger);
+        printParamsLog("getListToWeb查询处理参数:", logger);
+        //分页参数
+        int start = (getPage()) * getRows();
+        keVideos.setPage(start);
+        keVideos.setSize(getRows());
+
+        if (CheckUtil.isNullOrEmpty(
+                keVideos.getOrgId())) {
+            return;
+        }else {
+            try {
+                //查询总数
+                int rstCount = videosService.countVideos(keVideos);
+                //查询详情
+                List<Map> list = videosService.getVideosToWeb(keVideos);
+                for(Map<String,String> m: list){
+                    if(m.containsKey("videoUrl") ){
+                        String qiniuUrl = KeCommon.getPubURL(m.get("videoUrl").toString());
+                        m.put("videoUrl",qiniuUrl);
+                    }
+                    if(m.containsKey("createTime") ){
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+                        m.put("createTime",sdf.format(m.get("createTime")));
+                    }
+                }
+                // 返回结果
+                JSONArray jsonList = JSONArray.fromObject(list);
+                JSONObject json = new JSONObject();
+                json.element("total", rstCount);
+                json.element("rows", jsonList.toString());
+                print(json);
+                // 请求结束log
+                printEndLog("查询结束返回值:", json.toString(), logger);
+
             } catch (Exception e) {
                 printSysErr(e, logger);
             }

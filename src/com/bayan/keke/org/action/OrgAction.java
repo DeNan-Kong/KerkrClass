@@ -805,4 +805,20 @@ public class OrgAction extends BaseAction implements
 		getRequest().setAttribute("domain",KeCommon.QINIU_VIDEO_DOMIN);
 		return "toUploadVieo";
 	}
+	/**
+	 * 视频管理页面
+	 * @return
+	 */
+	public String toVideosList(){
+		//getRequest().setAttribute("domain",KeCommon.QINIU_VIDEO_DOMIN);
+		return "toVideosList";
+	}
+
+	/**
+	 * 更新视频相关信息
+	 * @return
+	 */
+	public String toUpdateVideo(){
+		return "toUpdateVideo";
+	}
 }

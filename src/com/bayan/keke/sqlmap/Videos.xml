@@ -4,28 +4,63 @@
 <mapper namespace="videos">
     <select id="getVideosInfo" resultType="map" parameterType="com.bayan.keke.vo.KeVideos">
         SELECT
+        id AS id,
         topic_img AS topicImg,
         video_url AS videoUrl,
         length AS length,
         title AS title,
-        description AS description
+        description AS description,
+        create_time AS createTime,
+        grade AS grade
         FROM ke_videos
-        WHERE org_id = #{orgId}
+        WHERE org_id = #{orgId} AND status = 1
+        <if test="grade != null">
+            AND grade = #{grade}
+        </if>
         <if test="page != null and size != null">
             LIMIT
             #{page},#{size}
         </if>
     </select>
 
-    <select id="getOrgId" resultType="string" parameterType="string">
-        SELECT org_id AS orgId
+    <select id="getOrgId" resultType="com.bayan.keke.vo.KeVideos" parameterType="string">
+        SELECT
+          org_id AS orgId,
+          grade AS grade
         FROM ke_user WHERE user_id = #{userId}
     </select>
+
+    <select id="countVideos" resultType="int" parameterType="com.bayan.keke.vo.KeVideos">
+        SELECT
+          COUNT(1)
+        FROM ke_videos
+        WHERE org_id = #{orgId}
+        AND status = 1
+    </select>
+
     <!--保存视频信息-->
     <insert id="saveVideoInfo" parameterType="com.bayan.keke.vo.KeVideos" useGeneratedKeys="true" keyProperty="id" >
         INSERT INTO ke_videos
-        (org_id,topic_img,length,video_url,create_time,status,title,description,hash_code)
+        (org_id,topic_img,length,video_url,create_time,status,title,description,hash_code,grade)
         VALUES
-        (#{orgId},#{topicImg},#{length},#{videoUrl},now(),1,#{title},#{description},#{hash})
+        (#{orgId},#{topicImg},#{length},#{videoUrl},now(),1,#{title},#{description},#{hash},#{grade})
     </insert>
+
+    <update id="deleteByStatus" parameterType="com.bayan.keke.vo.KeVideos">
+        UPDATE ke_videos
+        SET
+          status = 0,
+          update_time = now()
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateInfo" parameterType="com.bayan.keke.vo.KeVideos">
+       UPDATE ke_videos
+       SET
+          title = #{title},
+          description = #{description},
+          grade = #{grade},
+          update_time = now()
+        WHERE id = #{id}
+    </update>
 </mapper>

@@ -90,9 +90,11 @@ $(function () {
                     "orgId":$('#orgId').val(),
                     "title": $('#title').val(),
                     "description": $('#description').val(),
+                    "grade": $('#k-grade').val(),
                     "videoUrl": res.key,
                     "hash": res.hash,
-                    "length": res.fsize
+                    "fsize": res.fsize,
+                    "length": parseInt(res.length)
                 }
                 $.ajax({
                     url:'uploadCallBackVideos.jspx',
@@ -105,7 +107,7 @@ $(function () {
                         if(data.result){
                             var progress = new FileProgress(file, 'fsUploadProgress');
                             progress.setComplete(up, info);
-                            alert("success!");
+                            alert("上传成功！");
                         }else{
                             var progress = new FileProgress(file, 'fsUploadProgress');
                             progress.bindUploadCancel(up);
@@ -123,7 +125,8 @@ $(function () {
             }
             ,
             'Key': function(up, file) {
-                var key = createUniqueCode();
+                var exname = file.name.toLowerCase().split('.').splice(-1);
+                var key = createUniqueCode(exname);
                 //key = Qiniu.getFileExtension(file.name);
                 // do something with key
                 return key
@@ -305,9 +308,9 @@ $(function () {
 
 });
 
-function createUniqueCode(){
+function createUniqueCode(ex_name){
     var dataStr = new Date().format("yyMMddhhmmss").toString();
-    return dataStr + this.generateMixed(4);
+    return dataStr + this.generateMixed(4)+ "." +ex_name;
 }
 
 //指定位数随机码

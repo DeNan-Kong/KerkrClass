@@ -13,7 +13,7 @@ function createGridStudent() {
 		height : '500px',
 		striped : true,
 		fit : true,
-		rownumbers:true,
+		rowNumbers:true,
 		loadMsg : '正在努力为您查找中……',
 		idField : 'id',
 		singleSelect : true,

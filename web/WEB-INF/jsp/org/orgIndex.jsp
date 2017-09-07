@@ -100,11 +100,11 @@
                                                    nav-n="首页,上传视频,/toUploadVieoOrg.jspx">
                                                     <i class="fa fa-angle-right"></i> <span>上传视频</span></a>
                                             </li>
-                                            <%--<li class="active">
+                                            <li class="active">
                                                 <a href="javascript:void(0)" class="active"
-                                                   nav-n="首页,浏览视频,/toUploadVieoOrg.jspx">
-                                                    <i class="fa fa-angle-right"></i> <span>浏览视频</span> </a>
-                                            </li>--%>
+                                                   nav-n="首页,视频管理,/toVideosListOrg.jspx">
+                                                    <i class="fa fa-angle-right"></i> <span>视频管理</span> </a>
+                                            </li>
 
                                             <li class="active">
                                                 <a href="javascript:void(0)" class="active"

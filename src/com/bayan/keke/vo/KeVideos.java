@@ -40,16 +40,28 @@ public class KeVideos implements java.io.Serializable {
     private String title;
 
     private String description;
-
-    private Integer status;
-
+    /**
+     * 1,显示 2，不显示
+     */
+    private Boolean status;
+    /**
+     * 登入用户id
+     */
     private String userId;
-
+    /**
+     * 分页参数
+     */
     private Integer page;
 
     private Integer size;
-
+    /**
+     * 视频文件hash
+     */
     private String hash;
+    /**
+     * 年级
+     */
+    private String grade;
 
     public Integer getId() {
         return id;
@@ -123,11 +135,11 @@ public class KeVideos implements java.io.Serializable {
         this.description = description;
     }
 
-    public Integer getStatus() {
+    public Boolean getStatus() {
         return status;
     }
 
-    public void setStatus(Integer status) {
+    public void setStatus(Boolean status) {
         this.status = status;
     }
 
@@ -165,5 +177,13 @@ public class KeVideos implements java.io.Serializable {
 
     public void setHash(String hash) {
         this.hash = hash;
+    }
+
+    public String getGrade() {
+        return grade;
+    }
+
+    public void setGrade(String grade) {
+        this.grade = grade;
     }
 }

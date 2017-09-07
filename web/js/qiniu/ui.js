@@ -195,14 +195,14 @@ FileProgress.prototype.setComplete = function(up, info) {
     var url;
     if (res.url) {
         url = res.url;
-        str = "<div><strong>Link:</strong><a href=" + res.url + " target='_blank' > " + res.url + "</a></div>" +
-            "<div class=hash><strong>Hash:</strong>" + res.hash + "</div>";
+        str = "<div style='style='margin-top: 20px;'><a href=" + res.url + " target='_blank' ><button class= 'btn btn-default' >查看视频</button></a></div>" +
+            "<div style='height: 30px'></div>";
+
     } else {
         var domain = up.getOption('domain');
         url = domain + encodeURI(res.key);
-        var link = domain + res.key;
-        str = "<div><strong>Link:</strong><a href=" + url + " target='_blank' > " + link + "</a></div>" +
-            "<div class=hash><strong>Hash:</strong>" + res.hash + "</div>";
+        str = "<div style='margin-top: 20px;' ><a href=" + url + " target='_blank' ><button class= 'btn btn-default' >查看视频</button></a></div>" +
+            "<div style='height: 30px'></div>";
     }
 
     tdProgress.html(str).removeClass().next().next('.status').hide();

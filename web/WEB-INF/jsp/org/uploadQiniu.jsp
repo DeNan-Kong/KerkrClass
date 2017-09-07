@@ -1,4 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="s" uri="/struts-tags" %>
 <%@ page language="java" contentType="text/html; charset=utf-8"
          pageEncoding="utf-8" %>
 <c:set var="ctx" value="${pageContext.request.contextPath}"/>
@@ -11,6 +12,10 @@
     <link rel="stylesheet" href="${ctx}/css/qiniu/main.css"/>
     <link rel="stylesheet" href="${ctx}/css/qiniu/highlight.css"/>
     <link href="${ctx}/css/bootstrap.min.css" rel="stylesheet">
+    <link href="${ctx}/css/bootstrap-select.css" rel="stylesheet">
+
+    <%--select--%>
+    <script type="text/javascript" src="${ctx}/js/bootstrap-select.js"></script>
     <style>
         .k-body {
         }
@@ -19,34 +24,53 @@
 <body>
 <span style="white-space:pre">        </span><%--start新增七牛上传--%>
 <div class="k-body">
-    <div class="col-md-12" style="">
-        <div class="form-group" style="height:30px">
-            <label style="text-align: center;width: 100px;float: left" for="title">标题</label>
-            <input type="text" style="width: 500px;float: left" class="form-control" id="title" name="title"
+    <div class="col-md-12">
+        <div class="form-group">
+            <label style="text-align: center;width:100px;display:inline-block" for="title">标题</label>
+            <input type="text" style="width:500px;display:inline-block" class="form-control" id="title" name="title"
                    placeholder="请输入标题"/>
         </div>
         <div class="form-group">
-            <label style="text-align: center;width: 100px; float: left" for="title">描述</label>
-            <textarea type="text" style="width: 500px;float: left" class="form-control" id="description"
+            <label style="text-align: center;width:100px; display:inline-block;
+                    position: relative;left: 0;top: -37px;" for="description">描述</label>
+            <textarea type="text" style="width:500px; display:inline-block" class="form-control" id="description"
                       name="description"
-                      placeholder="请输入标题"/>
+                      placeholder="请输入视频描述"/>
         </div>
+
+        <div class="form-group">
+            <label style="text-align: center;width:100px; display:inline-block" for="k-grade">年级</label>
+            <div class="dropdown" style="width:500px; display:inline-block">
+                <select id="k-grade" name="k-grade" class="show-tick form-control ">
+                    <option value="一年级">一年级</option>
+                    <option value="二年级">二年级</option>
+                    <option value="三年级">三年级</option>
+                    <option value="四年级">四年级</option>
+                    <option value="五年级">五年级</option>
+                    <option value="六年级">六年级</option>
+                </select>
+            </div>
+        </div>
+
+        <%--<select style="width:500px; display:inline-block" id="grade" name="grade">
+        </select>--%>
+
         <input type="hidden" value="${sessionScope.userId}" id="orgId">
         <input type="hidden" value="${requestScope.domain}" id="domain">
     </div>
 
     <div class="col-md-12">
         <div id="container" style="margin-top:30px;margin-left: 43px;">
-            <a class="btn btn-default " id="pickfiles" style="width:160px;margin-right:50px" href="#">
+            <a class="btn btn-default " id="pickfiles" style="width:160px;margin-right:50px;display:inline-block" href="#">
                 <i class="glyphicon glyphicon-plus"></i>
                 <span>选择文件</span>
             </a>
 
-            <a class="btn btn-default " id="up_load" style="width:160px;margin-right:50px" >
+            <a class="btn btn-default " id="up_load" style="width:160px;margin-right:50px;display:inline-block">
                 <span>确认上传</span>
             </a>
 
-            <a class="btn btn-default  " id="stop_load" style="width:160px;margin-right:50px">
+            <a class="btn btn-default  " id="stop_load" style="width:160px;margin-right:50px;display:inline-block">
                 <span>暂停上传</span>
             </a>
         </div>
@@ -75,6 +99,15 @@
 </div>
 
 <span style="white-space:pre">        </span><%--end--%>
+<script>
+    //debugger;
+    $(function () {
+       /* $('#k-grade').selectpicker({
+
+        });*/
+    })
+
+</script>
 
 <%--upload--%>
 <script type="text/javascript" src="${ctx}/js/bootstrap.min.js"></script>
@@ -87,31 +120,5 @@
 <script type="text/javascript" src="${ctx}/js/qiniu/ui.js"></script>
 <script type="text/javascript" src="${ctx}/js/qiniu/highlight.js"></script>
 <script type="text/javascript" src="${ctx}/js/qiniu/main.js"></script>
-<script>
-    function abc() {
-        var data = {
-            "orgId":$('#orgId').val(),
-            "title": $('#title').val(),
-            "description": $('#description').val(),
-            "videoUrl":"1",
-            "hash": "2",
-            "length": "3"
-        }
-        $.ajax({
-            url:'uploadCallBackVideos.jspx',
-            type:'POST', //GET
-            async:false,    //或false,是否异步
-            data: data,
-            timeout:5000,    //超时时间
-            dataType:'json',    //返回的数据格式：json/xml/html/script/jsonp/text
-            success:function(data,textStatus,jqXHR){
-                console.log(data)
-                console.log(textStatus)
-                console.log(jqXHR)
-            }
-        })
-    }
-
-</script>
 </body>
 </html>

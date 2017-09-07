@@ -1,10 +1,9 @@
 $(function() {
     createGridVideos();
-    console.log("go……");
 });
 
 function createGridVideos() {
-    $('videos-list').datagrid( {
+    $('#videos-list').datagrid( {
         pagination : true,
         url : 'getListToWebVideos.jspx',
         method : 'post',
@@ -27,26 +26,43 @@ function createGridVideos() {
         }, {
             field : 'title',
             title : '标题',
-            width : '15%',
+            width : '20%',
             align : 'center'
         }, {
             field : 'description',
             title : '描述',
-            width : '20%',
+            width : '30%',
             align : 'center'
         },{
             field : 'grade',
             title : '年级',
             width : '5%',
-            align : 'center'
+            align : 'center',
+            formatter : function(val, rec){
+                if(val == "01"){
+                    return "一年级";
+                }else if(val == "02"){
+                    return "二年级";
+                }else if(val == "03"){
+                    return "三年级";
+                }else if(val == "04"){
+                    return "四年级";
+                }else if(val == "05"){
+                    return "五年级";
+                }else if(val == "06"){
+                    return "六年级";
+                }else{
+                    return "-";
+                }
+            }
         },{
             field : 'videoUrl',
             title : '视频',
-            width : '10%',
+            width : '6%',
             align : 'center',
             formatter : function(val, rec) {
-                const html = ['<a id="show"  href=" '+ val +' " data-toggle="modal" data-target=".bs-example-modal-sm " class="btn btn-info" >查看</a>'].join("");
-                return html;
+                //console.log(JSON.stringify(rec));
+                return '<a href="'+ val +'" data-toggle="modal" class="btn btn-info" target="_blank">查看</a>';
             }
         },{
             field : 'createTime',
@@ -54,30 +70,85 @@ function createGridVideos() {
             width : '10%',
             align : 'center'
         },{
-            field : 'id',
+            field : '-',
             title : '操作',
-            width : '100',
+            width : '6%',
             align : 'center',
             formatter : function(val, rec) {
-                return '<input type="button" class="btn btn-danger" '+
-                    'onclick=delTeacher("'+ val +'") value="删除" id="' + val +'"/>';
+                return '<a href="#" onclick="del(' +rec.id+ ')" class="btn btn-danger" id="del-' + rec.id +'"><i class="fa fa-times"></i></a>';
+                //return '<a href="toUpdateVideoOrg.jspx" class="btn btn-danger"></a>';
             }
-        } ] ]
+
+        } ] ],
+        onClickRow: function (rowIndex,data){
+            $("#title").val(data.title);
+            $("#description").val(data.description);
+            $("#k-grade").val(data.grade);
+            $("#k-id").val(data.id);
+
+            //alert(JSON.stringify(data));
+            //var row = $('#videos-list').datagrid('getSelected');
+        }
     });
 }
 
 //删除学生
-function delTeacher(tid){
+function del(id){
     // 删除学生
-    $.post('delTeacherOrg.jspx', {
-        'teacherId' : tid
+    $.post('deleteVideos.jspx', {
+        'id' : id
     }, function(data) {
-        if (data.result == "success") {
+        console.log(JSON.stringify(data));
+        if (data.code == 1000) {
             alert("删除成功");
-            $('#'+tid).attr("disabled","true");
-            $('#'+tid).css("background-color","#DDDDDD");
+            $('#del-'+id).attr("disabled","true");
+            $('#del-'+id).css("background-color","#e45c59");
         }else{
             alert("删除失败")
         }
     }, 'json');
+}
+//更新
+$("#update").click(
+function update(){
+    //选取表单
+    var form = $("#k-form");
+    //获取表单数据
+    var form_data = getFormData(form);
+
+    //发送AJAX请求
+    $.post('updateVideos.jspx',form_data,function(d){
+        let res = d.code;
+       console.log(res);
+        createGridVideos();
+        alert("更新成功");
+        /*if (d.code ) {
+            createGridVideos();
+            alert("更新成功");
+        }else{
+            alert("更新失败")
+        }*/
+    })
+});
+
+function getFormData(form){
+    var data = form.serialize();
+    data = decodeURI(data);
+    var arr = data.split('&');
+    var item,key,value,newData={};
+    for(var i=0;i<arr.length;i++){
+        item = arr[i].split('=');
+        key = item[0];
+        value = item[1];
+        if(key.indexOf('[]')!=-1){
+            key = key.replace('[]','');
+            if(!newData[key]){
+                newData[key] = [];
+            }
+            newData[key].push(value);
+        }else{
+            newData[key] = value;
+        }
+    }
+    return newData;
 }

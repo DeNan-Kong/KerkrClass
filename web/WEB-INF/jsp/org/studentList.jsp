@@ -54,7 +54,7 @@
         
 		
         <div class="col-md-6" style="height: 70%; width: 100%; margin-top: 20px;">
-            <div id="teh_grid" style="height: 20%; width: 70%; float: center;"></div>
+            <div id="teh_grid" style="height: 20%; width: 70%; float: left;"></div>
         </div>
     </body>
 </html>

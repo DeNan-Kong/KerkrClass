@@ -62,7 +62,7 @@ public class CheckUtil {
 	/**
 	 * 验证作业种类
 	 * 
-	 * @param number
+	 * @param
 	 * @return
 	 */
 	public static boolean isSubjectType(String subjectType) {
@@ -78,7 +78,7 @@ public class CheckUtil {
 	/**
 	 * 验证用户ID
 	 * 
-	 * @param number
+	 * @param
 	 * @return
 	 */
 	public static boolean isUserId(String userId) {
@@ -94,7 +94,7 @@ public class CheckUtil {
 	/**
 	 * 验证长度
 	 * 
-	 * @param number
+	 * @param
 	 * @return
 	 */
 	public static boolean checkLength(String parm, int length) {
