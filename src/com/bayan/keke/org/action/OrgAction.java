@@ -482,7 +482,7 @@ public class OrgAction extends BaseAction implements
 			Map<String, Object> reg = teaUsService.teaRegist(keTeaUs);
 			if (reg != null) {
 				
-				if(CheckUtil.isNullOrEmpty(reg.get("org_id").toString())){
+				if(reg.containsKey("org_id")){
 					
 					orgService.updateTeaInfo(keOrg);
 					
