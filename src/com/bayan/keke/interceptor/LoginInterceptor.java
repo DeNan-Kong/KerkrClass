@@ -132,7 +132,9 @@ public class LoginInterceptor extends AbstractInterceptor {
 		pathList.add("/listCitySales.jspx");
 		pathList.add("/addSales.jspx");
 		pathList.add("/updatePWSales.jspx");
-		
+		//移动APP注册学生
+		pathList.add("/addStuForAPPOrg.jspx");
+
 		// SID验证放行
 		// TODO 之后删除
 		pathList.add("/sidCheckSales.jspx");

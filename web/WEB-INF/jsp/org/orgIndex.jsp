@@ -92,6 +92,11 @@
                                             </li>
                                             <li class="active">
                                                 <a href="javascript:void(0)" class="active"
+                                                   nav-n="首页,注册审核,/toTeaListOrg.jspx">
+                                                    <i class="fa fa-angle-right"></i> <span>注册审核</span> </a>
+                                            </li>
+                                            <li class="active">
+                                                <a href="javascript:void(0)" class="active"
                                                    nav-n="首页,查询学生,/toStudentListOrg.jspx">
                                                     <i class="fa fa-angle-right"></i> <span>查询学生</span> </a>
                                             </li>

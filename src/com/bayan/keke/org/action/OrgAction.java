@@ -29,59 +29,59 @@ import net.sf.json.JSONObject;
 
 public class OrgAction extends BaseAction implements
 		ModelDriven<KeOrg>, Preparable {
-	
+
 	/**
 	 * 序列号
 	 */
 	private static final long serialVersionUID = 6875008194411825448L;
 
     private static final Logger logger = Logger.getLogger(OrgAction.class);
-    
+
 	@Resource
 	private OrgService orgService;
-	
+
 	@Resource
 	private SalesService salesService;
-	
+
 	@Resource
 	private CommonService commonService;
-	
+
 	@Resource
 	private TeaUsService teaUsService;
-	
+
 	@Resource
 	private UserService userService;
-    
+
 	private KeOrg keOrg;
 
 	/**
-	 * 
+	 *
 	 */
 	public KeOrg getModel() {
 		return keOrg;
 	}
 	/**
-	 * 
+	 *
 	 */
 	public void prepare() throws Exception {
 		keOrg = new KeOrg();
 	}
-	
+
 	/**
 	 * 机构登陆
 	 */
 	public String login() {
-		
+
 		printStartLog("login方法开始", logger);
 		printParamsLog("请求参数。", logger);
 		if (CheckUtil.checkNulls(
-				keOrg.getPhoneNumber(), 
+				keOrg.getPhoneNumber(),
 				keOrg.getPassword()
 				)) {
 			printErrorLog("传入的参数为空值,请参考参数日志", logger);
 			return "error";
 		}
-		
+
 		// 参数验证
 		if(!CheckUtil.checkLength(keOrg.getPhoneNumber(), 11)){
 			printErrorLog("传入的手机号长度不对,请参考参数日志", logger);
@@ -90,7 +90,7 @@ public class OrgAction extends BaseAction implements
 			printErrorLog("传入的密码长度不对,请参考参数日志", logger);
 			return "error";
 		}
-		
+
 		try {
 			// 判断该用户是否已注册
 			Map<String, Object> reg = orgService.selOrgInfo(keOrg);
@@ -125,22 +125,22 @@ public class OrgAction extends BaseAction implements
 			return "error";
 		}
 	}
-	
+
 	/**
 	 * 退出账号
 	 */
 	public String logout() {
 		printStartLog("方法开始logout", logger);
 		printParamsLog("退出账号处理参数:", logger);
-		
+
 		getSession().removeAttribute("userId");
 		getSession().removeAttribute("orgPhotoNum");
 		getSession().removeAttribute("orgName");
 		getSession().removeAttribute("userFlag");
-		
+
 		// 请求结束log
 		printEndLog("退出账号结束返回值:", "", logger);
-		
+
 		return "orgLogin";
 	}
 
@@ -158,7 +158,7 @@ public class OrgAction extends BaseAction implements
 				print("{\"code\":\"1005\",\"message\":\"输入参数为空或不正确\"}");
 				return;
 			} else {
-				
+
 				// 判断该用户是否已注册
 				Map<String, Object> reg = orgService.selOrgInfo(keOrg);
 				if (reg == null) {
@@ -166,7 +166,7 @@ public class OrgAction extends BaseAction implements
 					printParamsJSON(logger);
 					return;
 				}
-				
+
 				// 验证码发送间隔少于60秒
 				if(!SendCodeUtil.checkSendRcd(keOrg.getPhoneNumber(), commonService)){
 					// 发送失败
@@ -175,7 +175,7 @@ public class OrgAction extends BaseAction implements
 					printParamsJSON(logger);
 					return;
 				}
-				
+
 				//subMail短信服务验证码
 				String sms = SendCodeUtil.random(4);
 				KeSales keSales = new KeSales();
@@ -196,7 +196,7 @@ public class OrgAction extends BaseAction implements
 					print("{\"code\":\"1001\",\"message\":\"发送验证码失败\"}");
 					printParamsJSON(logger);
 					return;
-				}					
+				}
 			}
 		} catch (Exception e) {
 			// 服务器内部错误
@@ -205,7 +205,7 @@ public class OrgAction extends BaseAction implements
 			return;
 		}
 	}
-	
+
 	/**
 	 * 忘记密码
 	 */
@@ -228,7 +228,7 @@ public class OrgAction extends BaseAction implements
 					printErrorLog("密码重置失败！", logger);
 					return;
 				}else{
-					
+
 					//重新设置密码
 					Integer result = orgService.reSetPwd(keOrg);
 					if (result > 0) {
@@ -275,19 +275,19 @@ public class OrgAction extends BaseAction implements
 					printErrorLog("用户已经添加！", logger);
 					return;
 				}
-				
+
 				//添加机构信息
 				Integer result1 = orgService.insOrgInfo(keOrg);
-				
+
 				// 获取返回的ID
 				String id = keOrg.getId();
 				String orgId = "K"+String.valueOf(20000+Long.parseLong(id));
 				keOrg.setOrgId(orgId);
-				
+
 				// 更新机构orgID
 				Integer result2 = orgService.updateOrgId(keOrg);
 
-				
+
 				if (result1 > 0 && result2 > 0 ) {
 					print("{\"code\":\"1000\",\"message\":\"添加成功\"}");// 修改成功
 					printEndLog("1000", "添加机构成功！", logger);
@@ -305,7 +305,7 @@ public class OrgAction extends BaseAction implements
 			return;
 		}
 	}
-	
+
 	/**
 	 * 添加学生
 	 */
@@ -316,18 +316,18 @@ public class OrgAction extends BaseAction implements
 			printStartLog("addStudent方法开始", logger);
 			printParamsLog("请求参数。", logger);
 			if (CheckUtil.checkNulls(
-					keOrg.getPhoneNumber(), 
-					keOrg.getUserName(), 
+					keOrg.getPhoneNumber(),
+					keOrg.getUserName(),
 					keOrg.getGrade())) {
 				printErrorLog("传入的参数为空值,请参考参数日志", logger);
 				print("{\"code\":\"1005\",\"message\":\"请输入学生信息\"}");
 				return;
 			}
-			
+
 			String orgId = getSession().getAttribute("userId").toString();
 			keOrg.setUserId(keOrg.getPhoneNumber());
 			keOrg.setOrgId(orgId);
-			
+
 			KeUser keUser = new KeUser();
 			keUser.setPhoneNumber(keOrg.getPhoneNumber());
 			keUser.setUserName(keOrg.getUserName());
@@ -353,11 +353,11 @@ public class OrgAction extends BaseAction implements
 			// 判断该用户是否已注册
 			Map<String, Object> reg = userService.regist(keUser);
 			if (reg != null) {
-				
+
 				if(CheckUtil.isNullOrEmpty(reg.get("org_id").toString())){
-					
+
 					orgService.updateStuInfo(keOrg);
-					
+
 					// 添加成功
 					print("{\"code\":\"1000\",\"message\":\"添加成功\"}");
 					printEndLog("添加成功", "", logger);
@@ -395,14 +395,91 @@ public class OrgAction extends BaseAction implements
 			return;
 		}
 	}
-	
+
+    /**
+     * 移动APP注册学生
+     * 20170925 by
+     */
+    public void addStuForAPP() {
+        try {
+            printStartLog("addStuForAPP方法开始", logger);
+            printParamsLog("addStuForAPP请求参数", logger);
+            if (CheckUtil.checkNulls(
+                    keOrg.getPhoneNumber(),
+                    keOrg.getUserName(),
+                    keOrg.getGrade(),
+                    keOrg.getPassword())) {
+                printErrorLog("传入的参数为空值,请参考参数日志", logger);
+                print("{\"code\":\"1005\",\"message\":\"请输入学生信息\"}");
+                return;
+            }
+            keOrg.setUserId(keOrg.getPhoneNumber());
+            keOrg.setOrgId("K20002");//明之算机构
+
+            KeUser keUser = new KeUser();
+            keUser.setPhoneNumber(keOrg.getPhoneNumber());
+            keUser.setUserName(keOrg.getUserName());
+            keUser.setGrade(keOrg.getGrade());
+            keUser.setOrgId(keOrg.getOrgId());
+            keUser.setPassword(keOrg.getPassword());
+
+            // 首次注册的昵称为：课课
+            keUser.setNickName(keOrg.getUserName());
+            // 首次注册的等级为：普通
+            keUser.setStuLevel("0");
+            // 首次注册,添加一个假头像地址判断
+            keUser.setHeadUrl("kerkr999");
+            // 设置设备的用途：0学生,1老师
+            keUser.setFlag("0");
+            // 用户类型(0:试用,1:充值,2:在校生,3:网校生,4:未审核)
+            keUser.setType("4");
+
+            // 判断该用户是否已注册
+            Map<String, Object> reg = userService.regist(keUser);
+            if (reg != null) {
+                if(CheckUtil.isNullOrEmpty(reg.get("org_id").toString())){
+                    Integer updateResult = orgService.updateStuInfo(keOrg);
+                    // 添加成功
+                    print("{\"code\":\"1000\",\"message\":\"添加成功\"}");
+                    printEndLog("已存在用户更新", reg.toString(), logger);
+                }else{
+                    // 用户登录失败
+                    print("{\"code\":\"1001\",\"message\":\"该用户已加入其它机构\"}");
+                    printDebugLog("用户已加入其它机构", logger);
+                }
+                return;
+            }
+            // 如果用户不选择地理位置，就默认一个：中国大陆
+            if (CheckUtil.isNullOrEmpty(keUser.getCityCode()) || CheckUtil.isNullOrEmpty(keUser.getProvinceCode())) {
+                // 中国
+                keUser.setProvinceCode("910000");
+                // 大陆
+                keUser.setCityCode("910100");
+            }
+            // 将学生信息注册
+            Integer result = userService.add(keUser);
+            if (result > 0) {
+                print("{\"code\":\"1000\",\"message\":\"添加成功\"}");
+                printEndLog("注册成功", keUser.toString(), logger);
+            } else {
+                // 用户注册失败
+                print("{\"code\":\"1001\",\"message\":\"您的信息注册失败\"}");// 添加失败
+                printErrorLog("学生信息注册失败", logger);
+                return;
+            }
+        } catch (Exception e) {
+            // 服务器内部错误
+            printSysErr(e, logger);
+            return;
+        }
+    }
 	/**
 	 * 删除学生
 	 */
 	public void delStudent() {
 		printStartLog("方法开始delStudent", logger);
 		printParamsLog("删除学生处理参数:", logger);
-		
+
 		if(CheckUtil.isNullOrEmpty(keOrg.getUserId())){
 			printDebugLog("学生ID为空", logger);
 			// 返回结果
@@ -411,12 +488,12 @@ public class OrgAction extends BaseAction implements
 			print(json);
 			return;
 		}
-		
+
 		try {
-			
+
 			// 返回结果
 			JSONObject json = new JSONObject();
-			
+
 			// 删除学生
 			keOrg.setOrgId("");
 			Integer rst = orgService.updateStuInfo(keOrg);
@@ -426,14 +503,14 @@ public class OrgAction extends BaseAction implements
 				json.element("result", "fail");
 			}
 			print(json);
-			
+
 			// 请求结束log
 			printEndLog("删除学生结束返回值:", json.toString(), logger);
 		} catch (Exception e) {
 			printSysErr(e, logger);
 		}
 	}
-	
+
 	/**
 	 * 添加老师
 	 */
@@ -442,8 +519,8 @@ public class OrgAction extends BaseAction implements
 			printStartLog("addTeacher方法开始", logger);
 			printParamsLog("请求参数。", logger);
 			if (CheckUtil.checkNulls(
-					keOrg.getTeaPhone(), 
-					keOrg.getTeaName(), 
+					keOrg.getTeaPhone(),
+					keOrg.getTeaName(),
 					keOrg.getPassword())) {
 				printErrorLog("传入的参数为空值,请参考参数日志", logger);
 				print("{\"code\":\"1005\",\"message\":\"请输入老师信息\"}");
@@ -452,7 +529,7 @@ public class OrgAction extends BaseAction implements
 			String orgId = getSession().getAttribute("userId").toString();
 			keOrg.setOrgId(orgId);
 			keOrg.setTeacherId(keOrg.getTeaPhone());
-			
+
 			// 判断该用户是否已注册
 			KeTeaUs keTeaUs = new KeTeaUs();
 			keTeaUs.setPhoneNumber(keOrg.getTeaPhone());
@@ -461,7 +538,7 @@ public class OrgAction extends BaseAction implements
 			keTeaUs.setSubjectType(keOrg.getTeaSubject());
 			keTeaUs.setGrade(keOrg.getTeaGrade());
 			keTeaUs.setOrgId(orgId);
-			
+
 			//默认头像地址：kerkr999
 			keTeaUs.setHeadUrl("kerkr999");
 			//默认性别：男
@@ -481,11 +558,11 @@ public class OrgAction extends BaseAction implements
 
 			Map<String, Object> reg = teaUsService.teaRegist(keTeaUs);
 			if (reg != null) {
-				
+
 				if(reg.containsKey("org_id")){
-					
+
 					orgService.updateTeaInfo(keOrg);
-					
+
 					print("{\"code\":\"1000\",\"message\":\"添加成功\"}");
 					printEndLog("注册成功", "", logger);
 				}else{
@@ -506,7 +583,7 @@ public class OrgAction extends BaseAction implements
 				printErrorLog("注册失败", logger);
 				return;
 			}
-			
+
 			// 将数据库查询出来的所有数据做成Json对象
 			print("{\"code\":\"1000\",\"message\":\"添加成功\"}");
 			printEndLog("注册成功", "", logger);
@@ -517,14 +594,14 @@ public class OrgAction extends BaseAction implements
 			return;
 		}
 	}
-	
+
 	/**
 	 * 删除老师
 	 */
 	public void delTeacher() {
 		printStartLog("方法开始delTeacher", logger);
 		printParamsLog("删除老师处理参数:", logger);
-		
+
 		if(CheckUtil.isNullOrEmpty(keOrg.getTeacherId())){
 			printDebugLog("老师ID为空", logger);
 			// 返回结果
@@ -533,12 +610,12 @@ public class OrgAction extends BaseAction implements
 			print(json);
 			return;
 		}
-		
+
 		try {
-			
+
 			// 返回结果
 			JSONObject json = new JSONObject();
-			
+
 			// 删除老师
 			keOrg.setOrgId("");
 			Integer rst = orgService.updateTeaInfo(keOrg);
@@ -548,43 +625,43 @@ public class OrgAction extends BaseAction implements
 				json.element("result", "fail");
 			}
 			print(json);
-			
+
 			// 请求结束log
 			printEndLog("删除老师结束返回值:", json.toString(), logger);
 		} catch (Exception e) {
 			printSysErr(e, logger);
 		}
 	}
-	
+
 	/**
 	 * 学生一览
 	 */
 	public void studentList() {
 		printStartLog("方法开始studentList", logger);
 		printParamsLog("查询学生内容参数:", logger);
-		
+
 		int start = (getPage() - 1) * getRows();
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("page", start);
 		map.put("size", getRows());
 		map.put("grade", keOrg.getGrade());
 		map.put("orgId", getSession().getAttribute("userId").toString());
-		
+
 		try {
-			
+
 			// 查询学生个数
 			Integer rst = orgService.countStudent(map);
-			
+
 			// 查询学生详情
 			List<Map<String,Object>> list = orgService.selStuList(map);
-			
+
 			// 返回结果
 			JSONArray jsonList = JSONArray.fromObject(list);
 			JSONObject json = new JSONObject();
 			json.element("total", rst);
 			json.element("rows", jsonList.toString());
 			print(json);
-			
+
 			// 请求结束log
 			printEndLog("查询学生结束返回值:", json.toString(), logger);
 		} catch (Exception e) {
@@ -597,86 +674,86 @@ public class OrgAction extends BaseAction implements
 	public void teacherList() {
 		printStartLog("方法开始teacherList", logger);
 		printParamsLog("查询老师内容参数:", logger);
-		
+
 		int start = (getPage() - 1) * getRows();
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("page", start);
 		map.put("size", getRows());
 		map.put("orgId", getSession().getAttribute("userId").toString());
-		
+
 		try {
-			
+
 			// 查询老师个数
 			Integer rst = orgService.countTeacher(map);
-			
+
 			// 查询老师详情
 			List<Map<String,Object>> list = orgService.selTeaList(map);
-			
+
 			// 返回结果
 			JSONArray jsonList = JSONArray.fromObject(list);
 			JSONObject json = new JSONObject();
 			json.element("total", rst);
 			json.element("rows", jsonList.toString());
 			print(json);
-			
+
 			// 请求结束log
 			printEndLog("查询学生结束返回值:", json.toString(), logger);
 		} catch (Exception e) {
 			printSysErr(e, logger);
 		}
 	}
-	
+
 	/**
 	 * 老师一览
 	 */
 	public void jigouInfo() {
 		printStartLog("方法开始jigouInfo", logger);
 		printParamsLog("查询机构信息参数:", logger);
-		
+
 		int start = (getPage() - 1) * getRows();
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("page", start);
 		map.put("size", getRows());
 		map.put("orgId", keOrg.getOrgId());
-		
+
 		try {
-			
+
 			Integer rst = 0;
 			List<Map<String,Object>> list = null;
-			
+
 			if("1".equals(keOrg.getType())){
 				// 查询老师个数
 				rst = orgService.countTeacher(map);
-				
+
 				// 查询老师详情
 				list = orgService.selTeaList(map);
 			}else{
 				// 查询学生个数
 				rst = orgService.countStudent(map);
-				
+
 				// 查询学生详情
 				list = orgService.selStuList(map);
 			}
-			
+
 			// 返回结果
 			JSONArray jsonList = JSONArray.fromObject(list);
 			JSONObject json = new JSONObject();
 			json.element("total", rst);
 			json.element("rows", jsonList.toString());
 			print(json);
-			
+
 			// 请求结束log
 			printEndLog("查询学生结束返回值:", json.toString(), logger);
 		} catch (Exception e) {
 			printSysErr(e, logger);
 		}
 	}
-	
+
 	/**
 	 * 修改学生年级
-	 * 
+	 *
 	 */
-	public void changGrade() {		
+	public void changGrade() {
 		printStartLog("changGrade方法开始", logger);
 		printParamsLog("请求参数。", logger);
 		if (CheckUtil.checkNulls(
@@ -687,7 +764,7 @@ public class OrgAction extends BaseAction implements
 			print("{\"code\":\"1005\",\"message\":\"请选择要变换的年级\"}");
 			return;
 		}
-		
+
 		try {
 			Map<String, Object> map = new HashMap<String, Object>();
 			map.put("gradeone", keOrg.getGradeone());
@@ -709,30 +786,30 @@ public class OrgAction extends BaseAction implements
 			return;
 		}
 	}
-	
+
 	/**
 	 * 查询机构一览
 	 */
 	public void jigouList() {
 		printStartLog("方法开始jigouList", logger);
 		printParamsLog("查询机构一览处理参数:", logger);
-		
+
 		try {
-			
+
 			// 查询SID信息
 			List<Map<String,Object>> list = orgService.selOrgList();
-			
-			
+
+
 			JSONArray jsonList = JSONArray.fromObject(list);
 			print(jsonList);
-			
+
 			// 请求结束log
 			printEndLog("查询SID结束返回值:", jsonList.toString(), logger);
 		} catch (Exception e) {
 			printSysErr(e, logger);
 		}
 	}
-	
+
 	/**
 	 * 添加用户画面
 	 * @return

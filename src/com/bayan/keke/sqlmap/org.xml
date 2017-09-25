@@ -31,7 +31,8 @@
     <!-- 更新学生机构ID -->
     <update id="updateStuInfo" parameterType="org">
            UPDATE ke_user
-           SET org_id=#{orgId}
+           SET org_id = #{orgId},
+           type = #{type}
            <if test="userName != null">
            , user_name=#{userName}
            </if>

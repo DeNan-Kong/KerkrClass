@@ -52,8 +52,20 @@
             </div>
         </div>
 
-        <%--<select style="width:500px; display:inline-block" id="grade" name="grade">
-        </select>--%>
+        <div class="form-group">
+            <label style="text-align: center;width:100px; display:inline-block">观看权限</label>
+            <div class="dropdown" style="width:500px; display:inline-block">
+                <%--<select id="k-type" name="k-type" class="show-tick form-control ">
+                </select>--%>
+                <label style="font-weight: normal">
+                <input type="checkbox" name="k-type" value="1">
+                在校生</label>
+                <label style="font-weight: normal;margin-left: 50px">
+                <input type="checkbox" name="k-type" value="2">
+                网校生</label>                 
+
+            </div>
+        </div>
 
         <input type="hidden" value="${sessionScope.userId}" id="orgId">
         <input type="hidden" value="${requestScope.domain}" id="domain">
@@ -61,7 +73,8 @@
 
     <div class="col-md-12">
         <div id="container" style="margin-top:30px;margin-left: 43px;">
-            <a class="btn btn-default " id="pickfiles" style="width:160px;margin-right:50px;display:inline-block" href="#">
+            <a class="btn btn-default " id="pickfiles" style="width:160px;margin-right:50px;display:inline-block"
+               href="#">
                 <i class="glyphicon glyphicon-plus"></i>
                 <span>选择文件</span>
             </a>
@@ -102,9 +115,9 @@
 <script>
     //debugger;
     $(function () {
-       /* $('#k-grade').selectpicker({
+        /* $('#k-grade').selectpicker({
 
-        });*/
+         });*/
     })
 
 </script>

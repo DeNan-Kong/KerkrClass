@@ -117,11 +117,16 @@ function update(){
     var form_data = getFormData(form);
 
     //发送AJAX请求
-    $.post('updateVideos.jspx',form_data,function(d){
-        let res = d.code;
-       console.log(res);
-        createGridVideos();
-        alert("更新成功");
+    $.post('updateVideos.jspx',form_data,function(data,status){
+        var result = JSON.parse(data);
+       console.log("Data: " + data + "\nStatus: " + status);
+       if(result.code == 1000){
+           createGridVideos();
+           alert("更新成功");
+       }else {
+           alert(result.message)
+       }
+
         /*if (d.code ) {
             createGridVideos();
             alert("更新成功");
