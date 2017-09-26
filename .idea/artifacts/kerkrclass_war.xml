@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="KerkrClass:war">
+    <output-path>$PROJECT_DIR$/out/artifacts/KerkrClass_war</output-path>
+    <root id="archive" name="KerkrClass_war.war">
+      <element id="artifact" artifact-name="KerkrClass:war exploded" />
+    </root>
+  </artifact>
+</component>
