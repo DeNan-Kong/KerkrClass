@@ -22,7 +22,7 @@ public class UserService {
 	 * @return
 	 * @throws Exception
 	 */
-	public Map<String, Object> regist(KeUser keuser) throws Exception {
+	public KeUser regist(KeUser keuser) throws Exception {
 		return userDao.regist(keuser);
 	}
 	

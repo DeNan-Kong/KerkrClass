@@ -78,7 +78,7 @@ public class UserDao extends BaseDao {
 	 * @return
 	 * @throws Exception
 	 */
-	public Map<String, Object> regist(KeUser keUser) throws Exception {
+	public KeUser regist(KeUser keUser) throws Exception {
 		return this.getSqlSession().selectOne("user.register", keUser);
 	}
 

@@ -84,7 +84,7 @@ public class UserAction extends BaseAction implements
 				return;
 			} else {
 				//判断该用户是否已注册
-				Map<String, Object> reg = userService.regist(keUser);			
+				KeUser reg = userService.regist(keUser);
 				if (reg == null) {
 					//如果用户不选择地理位置，就默认一个：中国大陆
 					if (CheckUtil.isNullOrEmpty(keUser.getCityCode()) 
@@ -183,7 +183,7 @@ public class UserAction extends BaseAction implements
 				return;
 			} else {
 				//查询用户信息，判断该用户是否已注册
-				Map<String, Object> user = userService.regist(keUser);
+				KeUser user = userService.regist(keUser);
 				if (user == null) {
 
 					// 验证码发送间隔少于60秒
@@ -242,7 +242,7 @@ public class UserAction extends BaseAction implements
 				return;
 			} else {
 				//查询用户信息，判断该用户是否已注册
-				Map<String, Object> user = userService.regist(keUser);
+				KeUser user = userService.regist(keUser);
 				if (user == null) {
 					print("{\"code\":\"1001\",\"message\":\"手机号还未注册\"}");
 					printDebugLog("手机号还未注册", logger);
@@ -287,7 +287,7 @@ public class UserAction extends BaseAction implements
 	}
 	
 	/**
-	 * 学生端登陆
+	 * 学生端登陆(IOS&Android by kdn)
 	 */
 	public void login() {
 		try {
@@ -308,18 +308,22 @@ public class UserAction extends BaseAction implements
 				return;
 			} else {
 				//通过登录手机号和登录密码去查询用户信息
-				Map<String, Object> user = userService.regist(keUser);
+				KeUser user = userService.regist(keUser);
 				if (user == null) {
 					// 登录失败
 					print("{\"code\":\"1001\",\"message\":\"手机号还未注册\"}");
 					printDebugLog("手机号还未注册", logger);
 					return;
-				} else {						
+				} else if( "4".equals(user.getType()) ) {
+					//用户还在审核中
+					print("{\"code\":\"1003\",\"message\":\"正在审核中\"}");
+					printErrorLog("正在审核中,code：1003", logger);
+				} else {
 					//取得密码
-					String password = user.get("password").toString();
+					String password = user.getPassword();
 					if (keUser.getPassword().equals(password)) {
 							//七牛云下载头像
-							String headKey = user.get("head_url").toString();
+							String headKey = user.getHeadUrl();
 							String url = KeCommon.getHeadUrlSign(headKey);
 							//注册完成直接登录
 							Map<String, Object> list = userService.login(keUser);
@@ -387,7 +391,7 @@ public class UserAction extends BaseAction implements
 				return;
 			} else {
 				//判断该用户是否已注册
-				Map<String, Object> reg = userService.regist(keUser);			
+				KeUser reg = userService.regist(keUser);
 				if (reg == null) {
 					print("{\"code\":\"1001\",\"message\":\"账户还未注册\"}");
 					printErrorLog("账户还未注册！", logger);
@@ -826,7 +830,7 @@ public class UserAction extends BaseAction implements
 	
 	/**
 	 * 我的页面——用户信息
-	 * @param userId 用户ID
+	 * param userId 用户ID
 	 * @return 头像URL、学号、昵称、年级、所在地
 	 */
 	public void userInfo(){
@@ -842,7 +846,7 @@ public class UserAction extends BaseAction implements
 		try {
 			keUser.setPhoneNumber(keUser.getUserId());
 			//通过登录手机号去查询用户信息
-			Map<String, Object> user = userService.regist(keUser);
+			KeUser user = userService.regist(keUser);
 			if (user == null) {
 				// 登录失败
 				print("{\"code\":\"1001\",\"message\":\"找不到您的信息\"}");
@@ -850,7 +854,7 @@ public class UserAction extends BaseAction implements
 				return;
 			} else {
 				// 判断学生头像key是否为URL
-				String headKey = user.get("head_url").toString();
+				String headKey = user.getHeadUrl();
 				String url = null;
 				//判断头像key是否为可下载地址
 				if (isHttpUrl(headKey) || "kerkr999".equals(headKey)) {
@@ -861,21 +865,21 @@ public class UserAction extends BaseAction implements
 					url = KeCommon.getHeadUrlSign(headKey);
 				}
 				//学号字符串拼接
-				String idStr = user.get("id").toString();
+				String idStr = user.getId().toString();
 				int idInt = Integer.parseInt(idStr);
 				idInt = idInt + 15000000;
 				idStr = String.valueOf(idInt);
 				//将数据库查询出来的所有数据做成Json对象
 				JSONObject obj = new JSONObject();
 				obj.element("code", KeConstant.KE_SUCCESS);
-				obj.element("userId", user.get("user_id").toString());
-				obj.element("userName", user.get("user_name").toString());
-				obj.element("grade", user.get("grade").toString());
+				obj.element("userId", user.getUserId());
+				obj.element("userName", user.getUserName());
+				obj.element("grade", user.getGrade());
 				obj.element("headUrl", url);
 				obj.element("kekeId", idStr);
-				obj.element("cityCode", user.get("city_code").toString());
-				obj.element("provinceCode", user.get("province_code").toString());
-				print(obj);	
+				obj.element("cityCode", user.getCityCode());
+				obj.element("provinceCode", user.getProvinceCode() );
+				print(obj);
 				printEndLog(KeConstant.KE_SUCCESS, obj.toString(), logger);				
 			}
 		} catch (Exception e) {

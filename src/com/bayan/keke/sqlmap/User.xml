@@ -77,8 +77,19 @@
 	</select>
 	
 	<!-- 判断是否已注册  -->
-	<select id="register" resultType="map" parameterType="user">
-		select * from ke_user where user_id=#{phoneNumber}
+	<select id="register" resultType="user" parameterType="user">
+		select
+		id as id,
+		user_id as userId,
+		user_name as userName,
+		password as password,
+		org_id as orgId,
+		type as type,
+		grade as grage,
+		head_url as headUrl,
+		city_code as cityCode,
+		province_code  as provinceCode
+		from ke_user where user_id=#{phoneNumber}
 	</select>
 	
 	<!-- 根据手机号查找用户  -->

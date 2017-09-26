@@ -189,7 +189,7 @@ public class ActivityAction extends BaseAction
     		KeUser keuser = new KeUser();
     		keuser.setPhoneNumber(keActivity.getUserId());
 			//通过登录手机号去查询用户信息
-			Map<String, Object> user = userService.regist(keuser);
+			KeUser user = userService.regist(keuser);
 			if (user == null) {
 				// 登录失败
 				print("{\"code\":\"2001\",\"message\":\"系统出错啦\"}");
@@ -261,7 +261,7 @@ public class ActivityAction extends BaseAction
     		KeUser keuser = new KeUser();
     		keuser.setPhoneNumber(keActivity.getUserId());
 			//通过登录手机号去查询用户信息
-			Map<String, Object> user = userService.regist(keuser);
+			KeUser user = userService.regist(keuser);
 			if (user == null) {
 				// 登录失败
 				print("{\"code\":\"2001\",\"message\":\"系统出错啦\"}");

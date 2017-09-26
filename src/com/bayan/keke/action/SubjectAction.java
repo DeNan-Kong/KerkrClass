@@ -139,10 +139,10 @@ public class SubjectAction extends BaseAction
     		KeUser keUser = new KeUser();
     		keUser.setUserId(keSubject.getUserId());
     		keUser.setPhoneNumber(keSubject.getUserId());
-			Map<String, Object> reg = userService.regist(keUser);
+			KeUser reg = userService.regist(keUser);
 			if (reg != null) {
 				
-				if("0".equals(reg.get("org_id").toString())){
+				if( "0".equals(reg.getOrgId()) ){
 					// 用户登录失败
 					print("{\"code\":\"1001\",\"message\":\"您还没有加入任何一个机构哦\"}");
 					printDebugLog("您还没有加入任何机构", logger);

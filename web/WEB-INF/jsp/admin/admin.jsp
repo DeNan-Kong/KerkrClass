@@ -27,32 +27,32 @@
 <style type="text/css">
 .logob
 {
-    background-image: url("images/logoTea.png");
+    background-image: url("/images/logoTea.png");
     background-size:cover;
 }
 .logban
 {
-    background-image: url("images/logo/ban.png");
+    background-image: url("/images/logo/ban.png");
     background-size:cover;
 }
 .logtui
 {
-    background-image: url("images/logo/tui.png");
+    background-image: url("/images/logo/tui.png");
     background-size:cover;
 }
 .logguan
 {
-    background-image: url("images/logo/guan.png");
+    background-image: url("/images/logo/guan.png");
     background-size:cover;
 }
 .ke
 {
-    background-image: url("images/logo/ke.png");
+    background-image: url("/images/logo/ke.png");
     background-size:cover;
 }
 .shen
 {
-    background-image: url("images/logo/shen.png");
+    background-image: url("/images/logo/shen.png");
     background-size:cover;
 }
 </style>
