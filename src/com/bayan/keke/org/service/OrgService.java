@@ -186,4 +186,34 @@ public class OrgService {
 	public Integer changGrade(Map<String, Object> map) throws Exception {
 		return orgDao.changGrade(map);
 	}
+
+	/**
+	 * 待审核学生个数
+	 * @param map
+	 * @return
+	 * @throws Exception
+	 */
+	public Integer countApplyStu(Map map) throws Exception {
+		return orgDao.countApplyStu(map);
+	}
+
+	/**
+	 * 待审核学生详情
+	 * @param map
+	 * @return
+	 * @throws Exception
+	 */
+	public List<Map<String, Object>> getApplyStuList(Map map) throws Exception {
+		return orgDao.getApplyStuList(map);
+	}
+
+	/**
+	 * 新申请学生审核
+	 * @param keOrg
+	 * @return
+	 * @throws Exception
+	 */
+	public Integer checkApplyStu(KeOrg keOrg) throws Exception{
+		return orgDao.checkApplyStu(keOrg);
+	}
 }

@@ -50,7 +50,6 @@ public class VideosAction extends BaseAction implements
         keVideos = new KeVideos();
     }
 
-
     /**
      * 上传视频token，发布正式版需要更换 QINIU_BUCKET
      * clientUpload
@@ -88,12 +87,13 @@ public class VideosAction extends BaseAction implements
      */
     public void uploadCallBack() {
         printStartLog("视频上传信息回调方法开始", logger);
-
+        printParamsLog("视频上传信息回调参数:", logger);
         try{
             if (CheckUtil.checkNulls(
                     keVideos.getOrgId(),
                     keVideos.getVideoUrl(),
-                    keVideos.getTitle())){
+                    keVideos.getTitle())
+                    ){
                 printErrorLog("参数异常！",logger);
             }else{
                 String topicImgUrl = keVideos.getVideoUrl() + "?vframe/jpg/offset/7";//截取第七帧
@@ -103,7 +103,6 @@ public class VideosAction extends BaseAction implements
                 j.element("result",res);
                 j.element("message","call back videos info result!");
                 print(j);
-
             }
 
         }catch (Exception e) {
@@ -203,7 +202,6 @@ public class VideosAction extends BaseAction implements
         int start = (getPage() ) * getRows();
         keVideos.setPage(start);
         keVideos.setSize(getRows());
-
         if (CheckUtil.isNullOrEmpty(
                 keVideos.getOrgId())) {
             return;

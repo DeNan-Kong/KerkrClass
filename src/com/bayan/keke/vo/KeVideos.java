@@ -1,5 +1,7 @@
 package com.bayan.keke.vo;
 
+import net.sf.json.JSONObject;
+
 import java.sql.Date;
 
 /**
@@ -62,6 +64,10 @@ public class KeVideos implements java.io.Serializable {
      * 年级
      */
     private String grade;
+    //观看权限
+    private String watchAuthor;
+    //前端checkbox值
+    private String checkboxValue;
 
     public Integer getId() {
         return id;
@@ -185,5 +191,21 @@ public class KeVideos implements java.io.Serializable {
 
     public void setGrade(String grade) {
         this.grade = grade;
+    }
+
+    public String getWatchAuthor() {
+        return watchAuthor;
+    }
+
+    public void setWatchAuthor(String watchAuthor) {
+        this.watchAuthor = watchAuthor;
+    }
+
+    public String getCheckboxValue() {
+        return checkboxValue;
+    }
+
+    public void setCheckboxValue(String checkboxValue) {
+        this.checkboxValue = checkboxValue;
     }
 }

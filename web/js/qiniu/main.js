@@ -86,6 +86,14 @@ $(function () {
             },
             'FileUploaded': function (up, file, info) {
                 var res = $.parseJSON(info.response);
+                var checked = [];
+                $(".watch-author").click(function(){
+                    checked = [];
+                    $('input[name="k-type"]:checked').each(function(){
+                        checked.push($(this).val());
+                    });
+                    console.log(checked);
+                });
                 var data = {
                     "orgId":$('#orgId').val(),
                     "title": $('#title').val(),
@@ -94,7 +102,8 @@ $(function () {
                     "videoUrl": res.key,
                     "hash": res.hash,
                     "fsize": res.fsize,
-                    "length": parseInt(res.length)
+                    "length": parseInt(res.length),
+                    "checkboxValue": checked
                 }
                 $.ajax({
                     url:'uploadCallBackVideos.jspx',

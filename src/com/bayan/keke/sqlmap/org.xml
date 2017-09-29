@@ -4,73 +4,73 @@
 
     <!-- 添加机构信息-->
     <insert id="insOrgInfo" parameterType="org">
-          <selectKey resultType="string" keyProperty="id">  
-               SELECT LAST_INSERT_ID()  
-          </selectKey> 
+        <selectKey resultType="string" keyProperty="id">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
         INSERT INTO ke_org_info(org_name,password,org_address,phone_num,create_time)
         VALUES(#{orgName},#{password},#{orgAddress},#{orgPhoneNumber},NOW())
     </insert>
 
-	<!-- 查询机构信息  -->
-	<select id="selOrgInfoWithId" resultType="map" parameterType="org">
+    <!-- 查询机构信息  -->
+    <select id="selOrgInfoWithId" resultType="map" parameterType="org">
 		SELECT * FROM ke_org_info WHERE org_id=#{orgId}
 	</select>
-	
-	<!-- 判断是否已注册  -->
-	<select id="selOrgInfo" resultType="map" parameterType="org">
+
+    <!-- 判断是否已注册  -->
+    <select id="selOrgInfo" resultType="map" parameterType="org">
 		SELECT * FROM ke_org_info WHERE phone_num=#{phoneNumber}
 	</select>
-    
+
     <!-- 更新机构ID -->
     <update id="updateOrgId" parameterType="org">
            UPDATE ke_org_info
            SET org_id=#{orgId}
            WHERE id=#{id}
     </update>
-    
+
     <!-- 更新学生机构ID -->
     <update id="updateStuInfo" parameterType="org">
-           UPDATE ke_user
-           SET org_id = #{orgId},
-           type = #{type}
-           <if test="userName != null">
-           , user_name=#{userName}
-           </if>
-           <if test="grade != null">
-           , grade=#{grade}
-           </if>
-           <if test="password != null">
-           , password=#{password}
-           </if>
-           WHERE user_id=#{userId}
+        UPDATE ke_user
+        SET org_id = #{orgId},
+        type = #{type}
+        <if test="userName != null">
+            , user_name=#{userName}
+        </if>
+        <if test="grade != null">
+            , grade=#{grade}
+        </if>
+        <if test="password != null">
+            , password=#{password}
+        </if>
+        WHERE user_id=#{userId}
     </update>
-    
+
     <!-- 更新老师机构ID -->
     <update id="updateTeaInfo" parameterType="org">
-           UPDATE ke_teacher
-           SET org_id=#{orgId}
-           <if test="teaName != null">
-           , teacher_name=#{teaName}
-           </if>
-           <if test="teaSubject != null">
-           , subject_id='02'
-           </if>
-           <if test="teaGrade != null">
-           , grade=#{teaGrade}
-           </if>
-           <if test="password != null">
-           , password=#{password}
-           </if>
-           WHERE teacher_id=#{teacherId}
+        UPDATE ke_teacher
+        SET org_id=#{orgId}
+        <if test="teaName != null">
+            , teacher_name=#{teaName}
+        </if>
+        <if test="teaSubject != null">
+            , subject_id='02'
+        </if>
+        <if test="teaGrade != null">
+            , grade=#{teaGrade}
+        </if>
+        <if test="password != null">
+            , password=#{password}
+        </if>
+        WHERE teacher_id=#{teacherId}
     </update>
-    
+
     <!-- 忘记密码，重置 -->
     <update id="reSetPwd" parameterType="org">
         UPDATE ke_org_info
         SET password=#{password},update_time=now()
         WHERE phone_num=#{phoneNumber}
     </update>
-    
+
     <!-- 判断用户是否已经添加  -->
     <select id="selOrgList" resultType="map">
         SELECT org_id,
@@ -79,7 +79,7 @@
         phone_num
         FROM ke_org_info;
     </select>
-    
+
     <!-- 查询学生人数 -->
     <select id="countStudent" parameterType="org" resultType="int">
         SELECT count(1) FROM ke_user a
@@ -110,7 +110,7 @@
         ON a.province_code=c.city_code
         WHERE a.org_id=#{orgId}
         <if test="grade != null and grade != ''">
-        AND a.grade=#{grade}
+            AND a.grade=#{grade}
         </if>
         limit
         #{page},#{size}
@@ -140,12 +140,53 @@
         limit
         #{page},#{size}
     </select>
-    
+
     <!-- 变换学生年级 -->
     <update id="reSetGrade" parameterType="map">
         UPDATE ke_user
 		SET grade=#{gradetwo},update_time=NOW()
 		WHERE grade=#{gradeone}
 		AND org_id=#{orgId}
+    </update>
+
+    <!--查询待审核申请学生列表 20170926 by kdn -->
+    <select id="getApplyUsers" parameterType="map" resultType="map">
+        SELECT a.id,
+        a.user_id userId,
+        a.user_name name,
+        a.grade grade,
+        a.phone_number phoneNumber,
+        a.user_level stuLevel,
+        DATE_FORMAT(a.create_time, '%Y-%m-%d') createTime,
+        b.city_name cityName,
+        c.city_name provinceName,
+        a.type type,
+        '0' userType
+        FROM ke_user a
+        LEFT JOIN ke_city b
+        ON a.city_code=b.city_code
+        LEFT JOIN ke_city c
+        ON a.province_code=c.city_code
+        WHERE a.org_id=#{orgId}
+        AND type = #{type}
+        ORDER BY a.create_time DESC
+        limit
+        #{page},#{size}
+    </select>
+    <select id="countApplyUsers" parameterType="map" resultType="int">
+        SELECT count(1)
+        FROM ke_user
+        WHERE org_id=#{orgId}
+        AND type = #{type}
+    </select>
+    <!--新申请学生审核-->
+    <update id="checkApplyStu">
+      UPDATE ke_user
+      SET
+        org_id = #{orgId},
+        on_type = #{onType},
+        type = #{type},
+        update_time = NOW()
+      WHERE id = #{id}
     </update>
 </mapper>

@@ -9,7 +9,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
         <title>未完成</title>
         <link rel="stylesheet" href="./css/go.css" type="text/css">
-        <script type="text/javascript" src="./js/certification/certification.js"></script>
+        <script type="text/javascript" src="/js/certification/certification.js"></script>
         <script type="text/javascript">
 		    function checkUserForm(teacherId,approveStatus) {
 		        $.post('updateApprvStatusManage.jspx',{'teacherId':teacherId,'approveStatus':approveStatus},function(data){

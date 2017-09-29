@@ -2,6 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <!-- 查询当前的版本号-->
 <mapper namespace="videos">
+    <!--添加观看权限 170829-->
     <select id="getVideosInfo" resultType="map" parameterType="com.bayan.keke.vo.KeVideos">
         SELECT
         id AS id,
@@ -14,6 +15,17 @@
         grade AS grade
         FROM ke_videos
         WHERE org_id = #{orgId} AND status = 1
+        <choose>
+            <when test="watchAuthor == 4">
+                AND watch_author = #{watchAuthor}
+            </when>
+            <when test="watchAuthor == null">
+
+            </when>
+            <otherwise>
+                AND watch_author in (#{watchAuthor},1)
+            </otherwise>
+        </choose>
         <if test="grade != null">
             AND grade = #{grade}
         </if>
@@ -26,7 +38,8 @@
     <select id="getOrgId" resultType="com.bayan.keke.vo.KeVideos" parameterType="string">
         SELECT
           org_id AS orgId,
-          grade AS grade
+          grade AS grade,
+          on_type AS watchAuthor
         FROM ke_user WHERE user_id = #{userId}
     </select>
 
@@ -41,9 +54,9 @@
     <!--保存视频信息-->
     <insert id="saveVideoInfo" parameterType="com.bayan.keke.vo.KeVideos" useGeneratedKeys="true" keyProperty="id" >
         INSERT INTO ke_videos
-        (org_id,topic_img,length,video_url,create_time,status,title,description,hash_code,grade)
+        (org_id,topic_img,length,video_url,create_time,status,title,description,hash_code,grade,watch_author)
         VALUES
-        (#{orgId},#{topicImg},#{length},#{videoUrl},now(),1,#{title},#{description},#{hash},#{grade})
+        (#{orgId},#{topicImg},#{length},#{videoUrl},now(),1,#{title},#{description},#{hash},#{grade},#{watchAuthor})
     </insert>
 
     <update id="deleteByStatus" parameterType="com.bayan.keke.vo.KeVideos">
@@ -60,7 +73,8 @@
           title = #{title},
           description = #{description},
           grade = #{grade},
-          update_time = now()
+          update_time = now(),
+          watch_author = #{watchAuthor}
         WHERE id = #{id}
     </update>
 </mapper>

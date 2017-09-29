@@ -58,11 +58,11 @@ function createGridVideos() {
         },{
             field : 'videoUrl',
             title : '视频',
-            width : '6%',
+            width : '8%',
             align : 'center',
             formatter : function(val, rec) {
                 //console.log(JSON.stringify(rec));
-                return '<a href="'+ val +'" data-toggle="modal" class="btn btn-info" target="_blank">查看</a>';
+                return '<a href="'+ val +'" data-toggle="modal" class="btn btn-info" style="margin: 3px" target="_blank">查看</a>';
             }
         },{
             field : 'createTime',
@@ -108,14 +108,24 @@ function del(id){
         }
     }, 'json');
 }
+
 //更新
+var checked = new Array();
+$(".watch-author").click(function(){
+    checked = [];
+    $('input[name="k-type"]:checked').each(function(){
+        checked.push($(this).val());
+    });
+    //console.log(checked);
+});
 $("#update").click(
 function update(){
     //选取表单
     var form = $("#k-form");
     //获取表单数据
     var form_data = getFormData(form);
-
+    form_data.checkboxValue = checked.toString();
+    console.log(form_data);
     //发送AJAX请求
     $.post('updateVideos.jspx',form_data,function(data,status){
         var result = JSON.parse(data);

@@ -7,7 +7,6 @@ import java.util.Map;
 import javax.annotation.Resource;
 
 import com.bayan.keke.action.KeCommon;
-import com.bayan.keke.submail.utils.StringUtil;
 import com.bayan.keke.util.Md5Util;
 import org.apache.log4j.Logger;
 
@@ -417,8 +416,8 @@ public class OrgAction extends BaseAction implements
                 return;
             }
             keOrg.setUserId(keOrg.getPhoneNumber());
-            keOrg.setOrgId("K20012");//明之算测试
-            //keOrg.setOrgId("K20002");//明之算机构
+            keOrg.setOrgId(KeCommon.ORGID_TEST);//明之算测试
+            //keOrg.setOrgId(KeCommon.ORGID_MINGZS);//明之算机构
             String phone = keOrg.getPhoneNumber();
             KeUser keUser = new KeUser();
             keUser.setPhoneNumber(phone);
@@ -679,6 +678,88 @@ public class OrgAction extends BaseAction implements
     }
 
     /**
+     * 查询待审核申请学生列表
+     * 20170926 by kdn
+     */
+    public void applyStuList() {
+        printStartLog("applyStuList方法开始", logger);
+        printParamsLog("applyStuList查询学生内容参数:", logger);
+
+        int start = (getPage() - 1) * getRows();
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("page", start);
+        map.put("size", getRows());
+        map.put("orgId", getSession().getAttribute("userId").toString());
+        // 用户类型(0:试用,1:充值,4:申请中)
+        map.put("type", KeCommon.TYPE_APPLY);
+
+        try {
+
+            // 待审核学生个数
+            Integer rst = orgService.countApplyStu(map);
+
+            // 待审核学生详情
+            List<Map<String, Object>> list = orgService.getApplyStuList(map);
+
+            // 返回结果
+            JSONArray jsonList = JSONArray.fromObject(list);
+            JSONObject json = new JSONObject();
+            json.element("total", rst);
+            json.element("rows", jsonList.toString());
+            print(json);
+
+            // 请求结束log
+            printEndLog("查询学生结束返回值:", json.toString(), logger);
+        } catch (Exception e) {
+            printSysErr(e, logger);
+        }
+    }
+
+    /**
+     * 新申请学生审核
+     * 20170927 by kdn
+     */
+    public void checkApplyStu() {
+        printStartLog("checkApplyStu方法开始", logger);
+        printParamsLog("checkApplyStu查询学生内容参数:", logger);
+        JSONObject json = new JSONObject();
+        try {
+            if (CheckUtil.checkNulls(
+                    keOrg.getId(),
+                    keOrg.getType(),
+                    getSession().getAttribute("userId").toString()
+            )) {
+                printDebugLog("传入的参数为空值,请参考参数日志", logger);
+                json.element("result", "fail");
+                print(json);
+            } else {
+                //类型(0:试用,1:充值,2:在校生,3:网校生,4:申请中)
+                if( KeCommon.TYPE_APPLY.equals(keOrg.getType()) ){
+
+                }else {
+                    keOrg.setOnType(Integer.valueOf(keOrg.getType()) );
+                    keOrg.setType("0");
+                    keOrg.setOrgId(getSession().getAttribute("userId").toString());
+                }
+
+                Integer rst = orgService.checkApplyStu(keOrg);
+
+                // 返回结果
+                if (rst > 0) {
+                    json.element("result", "success");
+                } else {
+                    json.element("result", "fail");
+                }
+                print(json);
+            }
+            // 请求结束log
+            printEndLog("查询学生结束返回值:", json.toString(), logger);
+        } catch (Exception e) {
+            printSysErr(e, logger);
+        }
+    }
+
+    /**
      * 老师一览
      */
     public void teacherList() {
@@ -927,5 +1008,14 @@ public class OrgAction extends BaseAction implements
      */
     public String toUpdateVideo() {
         return "toUpdateVideo";
+    }
+
+    /**
+     * 待审核列表页面
+     *
+     * @return
+     */
+    public String toApplyList() {
+        return "toApplyList";
     }
 }

@@ -4,10 +4,10 @@ $(function() {
 
 function createGridStudent() {
 	
-	$('#teh_grid').datagrid( {
+	$('#apply-grid').datagrid( {
 		pagination : true,
-		url : 'teacherListOrg.jspx',
-		title : '老师详情',
+		url : 'applyStuListOrg.jspx',
+		//title : '',
 		method : 'post',
 		width : '90%',
 		height : '500px',
@@ -28,22 +28,6 @@ function createGridStudent() {
 			width : '15%',
 			align : 'center'
 		}, {
-			field : 'subjectId',
-			title : '科目',
-			width : '10%',
-			align : 'center',
-			formatter : function(val, rec){
-				if(val == "01"){
-					return "语文";
-				}else if(val == "02"){
-					return "数学";
-				}else if(val == "03"){
-					return "英语";
-				}else{
-					return "";
-				}
-			}
-		},{
 			field : 'grade',
 			title : '年级',
 			width : '15%',
@@ -68,33 +52,33 @@ function createGridStudent() {
 		},{
 			field : 'createTime',
 			title : '注册时间',
-			width : '20%',
+			width : '15%',
 			align : 'center'
 		}, {
-			field : 'teacherId',
-			title : '操作',
-			width : '100',
+			field : 'id',
+			title : '审核',
+			width : '380px',
 			align : 'center',
 			formatter : function(val, rec) {
-				return '<input type="button" style="background-color: #FF8888;border-width: 1px;height:23px;width:50px;" '+
-				'onclick=delTeacher("'+ val +'") value="删除" id="' + val +'"/>';
+                return "<input style='margin: 5px' class='btn btn-success btn-s-xs' type='button' onclick=\"javascript:checkStu("+val+",'2')\" value=\"审核为在校生\">" +
+                    "<input style='margin: 5px' class=\"btn btn-success btn-s-xs\" type=\"button\" onclick=\"javascript:checkStu("+val+",'3')\" value=\"审核为网校生\">" +
+                    "<input style='margin: 5px' class=\"btn btn-danger btn-s-xs\" type=\"button\" onclick=\"javascript:checkStu("+val+",'4')\" value=\"审核不通过\">"
 			}
 		}  ] ]
 	});
 }
 
-//删除学生
-function delTeacher(tid){
-	// 删除学生
-	$.post('delTeacherOrg.jspx', {
-		'teacherId' : tid
+//审核学生
+function checkStu(id,type){
+	$.post('checkApplyStuOrg.jspx', {
+		'id' : id,
+		'type':type
 	}, function(data) {
 		if (data.result == "success") {
-			alert("删除成功");
-			$('#'+tid).attr("disabled","true");
-			$('#'+tid).css("background-color","#DDDDDD");
+			alert("审核成功");
+            createGridStudent();
 		}else{
-			alert("删除失败")
+			alert("审核不成功")
 		}
 	}, 'json');
 }

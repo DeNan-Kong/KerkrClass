@@ -165,8 +165,7 @@ public class OrgDao extends BaseDao {
 	}
 	/**
 	 * 将老师机构ID改为空
-	 * 
-	 * @param keTeaSub
+	 * @param keOrg
 	 * @return
 	 * @throws Exception
 	 */
@@ -177,12 +176,38 @@ public class OrgDao extends BaseDao {
 	
 	/**
 	 * 变换学生年级
-	 * 
 	 * @param map
 	 * @return
 	 * @throws Exception
 	 */
 	public Integer changGrade(Map<String, Object> map) throws Exception {
 		return this.getSqlSession().update("org.reSetGrade", map);
+	}
+
+	/**
+	 * 待审核学生个数
+	 * @param map
+	 * @return
+	 */
+	public Integer countApplyStu(Map map){
+		return this.getSqlSession().selectOne("org.countApplyUsers",map);
+	}
+
+	/**
+	 * 待审核学生详情
+	 * @param map
+	 * @return
+	 */
+	public List<Map<String, Object>> getApplyStuList(Map map){
+		return this.getSqlSession().selectList("org.getApplyUsers",map);
+	}
+
+	/**
+	 * 新申请学生审核
+	 * @param keOrg
+	 * @return
+	 */
+	public Integer checkApplyStu(KeOrg keOrg){
+		return this.getSqlSession().update("org.checkApplyStu",keOrg);
 	}
 }

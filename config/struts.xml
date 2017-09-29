@@ -138,6 +138,7 @@
 		    <result name="toUploadVieo">WEB-INF/jsp/org/uploadQiniu.jsp</result>
 		    <result name="toVideosList">WEB-INF/jsp/org/videosList.jsp</result>
 		    <result name="toUpdateVideo">WEB-INF/jsp/org/updateVideoInfo.jsp</result>
+		    <result name="toApplyList">WEB-INF/jsp/org/applyList.jsp</result>
         </action>
         <action name="*Report" class="com.bayan.keke.action.ReportAction"
             method="{1}">

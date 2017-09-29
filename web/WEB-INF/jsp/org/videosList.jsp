@@ -30,7 +30,6 @@
                           name="description"
                           placeholder="请输入视频描述"></textarea>
             </div>
-
             <div class="form-group">
                 <label style="text-align: center;width:100px; display:inline-block" for="k-grade">年级</label>
                 <div class="dropdown" style="width:500px; display:inline-block">
@@ -44,6 +43,20 @@
                     </select>
                 </div>
             </div>
+            <div class="form-group">
+                <label style="text-align: center;width:100px; display:inline-block">观看权限</label>
+                <div class="dropdown" style="width:500px; display:inline-block" >
+                    <%--<select id="k-type" name="k-type" class="show-tick form-control ">
+                    </select>--%>
+                    <label style="font-weight: normal" class="watch-author">
+                        <input type="checkbox" name="k-type" value="2">
+                        在校生</label>
+                    <label style="font-weight: normal;margin-left: 50px" class="watch-author">
+                        <input type="checkbox" name="k-type" value="3">
+                        网校生</label>               
+                </div>
+            </div>
+
             <input type="hidden" name="id" id="k-id"/>
             <input type="hidden" id="orgId" value="${sessionScope.userId}"/>
 

@@ -92,7 +92,7 @@
                                             </li>
                                             <li class="active">
                                                 <a href="javascript:void(0)" class="active"
-                                                   nav-n="首页,注册审核,/toTeaListOrg.jspx">
+                                                   nav-n="首页,注册审核,/toApplyListOrg.jspx">
                                                     <i class="fa fa-angle-right"></i> <span>注册审核</span> </a>
                                             </li>
                                             <li class="active">

@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -176,7 +175,19 @@ public class KeCommon {
 	
 	//SID使用次数
 	public static final String SID_COUNT = "500";
-	
+
+	/** ==========学生用户配置====start=============*/
+	//机构ID
+	public static final String ORGID_TEST = "K20012";
+	public static final String ORGID_MINGZS = "K20002";
+	//类型(0:试用,1:充值,2:在校生,3:网校生,4:申请中)
+	public static final String TYPE_TRY = "0";
+	public static final String TYPE_PAY = "1";
+	public static final String TYPE_INSCHCOOL = "2";
+	public static final String TYPE_ONLINE = "3";
+	public static final String TYPE_APPLY = "4";
+	/** ==========学生用户配置====end=============*/
+
     /**
      * 获取学分
      * @param countRight
