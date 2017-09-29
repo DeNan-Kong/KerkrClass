@@ -92,7 +92,7 @@ $(function () {
                     $('input[name="k-type"]:checked').each(function(){
                         checked.push($(this).val());
                     });
-                    console.log(checked);
+                    //console.log(checked);
                 });
                 var data = {
                     "orgId":$('#orgId').val(),

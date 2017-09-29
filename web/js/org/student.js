@@ -81,6 +81,20 @@ function createGridStudent(gradezero) {
 				}
 			}
 		},{
+			field : 'onType',
+			title : '学生类型',
+			width : '15%',
+			align : 'center',
+            formatter : function(val, rec){
+                if(val == 2){
+                    return "在校生";
+                }else if(val == 3){
+                    return "网校生";
+                }else{
+                    return "-";
+                }
+            }
+		}, {
 			field : 'createTime',
 			title : '注册时间',
 			width : '20%',

@@ -62,7 +62,7 @@ function createGridStudent() {
 			formatter : function(val, rec) {
                 return "<input style='margin: 5px' class='btn btn-success btn-s-xs' type='button' onclick=\"javascript:checkStu("+val+",'2')\" value=\"审核为在校生\">" +
                     "<input style='margin: 5px' class=\"btn btn-success btn-s-xs\" type=\"button\" onclick=\"javascript:checkStu("+val+",'3')\" value=\"审核为网校生\">" +
-                    "<input style='margin: 5px' class=\"btn btn-danger btn-s-xs\" type=\"button\" onclick=\"javascript:checkStu("+val+",'4')\" value=\"审核不通过\">"
+                    "<input style='margin: 5px' class=\"btn btn-danger btn-s-xs\" type=\"button\" onclick=\"javascript:checkStu("+val+",'5')\" value=\"审核不通过\">"
 			}
 		}  ] ]
 	});

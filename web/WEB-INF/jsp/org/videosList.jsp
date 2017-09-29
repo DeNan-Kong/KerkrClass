@@ -49,10 +49,10 @@
                     <%--<select id="k-type" name="k-type" class="show-tick form-control ">
                     </select>--%>
                     <label style="font-weight: normal" class="watch-author">
-                        <input type="checkbox" name="k-type" value="2">
+                        <input type="checkbox" name="k-type" value="2" id="k-type-2">
                         在校生</label>
                     <label style="font-weight: normal;margin-left: 50px" class="watch-author">
-                        <input type="checkbox" name="k-type" value="3">
+                        <input type="checkbox" name="k-type" value="3" id="k-type-3">
                         网校生</label>               
                 </div>
             </div>

@@ -102,6 +102,7 @@
         b.city_name cityName,
         c.city_name provinceName,
         a.type type,
+        a.on_type onType,
         '0' userType
         FROM ke_user a
         LEFT JOIN ke_city b

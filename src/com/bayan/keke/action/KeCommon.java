@@ -180,12 +180,13 @@ public class KeCommon {
 	//机构ID
 	public static final String ORGID_TEST = "K20012";
 	public static final String ORGID_MINGZS = "K20002";
-	//类型(0:试用,1:充值,2:在校生,3:网校生,4:申请中)
+	//类型(0:试用,1:充值,2:在校生,3:网校生,4:申请中,5:申请未通过)
 	public static final String TYPE_TRY = "0";
 	public static final String TYPE_PAY = "1";
 	public static final String TYPE_INSCHCOOL = "2";
 	public static final String TYPE_ONLINE = "3";
 	public static final String TYPE_APPLY = "4";
+	public static final String TYPE_NOPASS = "5";
 	/** ==========学生用户配置====end=============*/
 
     /**

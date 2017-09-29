@@ -53,7 +53,7 @@ public class KeVideos implements java.io.Serializable {
     /**
      * 分页参数
      */
-    private Integer page;
+    private Integer start;
 
     private Integer size;
     /**
@@ -149,12 +149,12 @@ public class KeVideos implements java.io.Serializable {
         this.status = status;
     }
 
-    public Integer getPage() {
-        return page;
+    public Integer getStart() {
+        return start;
     }
 
-    public void setPage(Integer page) {
-        this.page = page;
+    public void setStart(Integer start) {
+        this.start = start;
     }
 
     public Integer getSize() {

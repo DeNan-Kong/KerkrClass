@@ -113,13 +113,13 @@
 <span style="white-space:pre">        </span><%--end--%>
 <script>
     //debugger;
-    $(".watch-author").click(function(){
+    /*$(".watch-author").click(function(){
         var checked = [];
         $('input[name="k-type"]:checked').each(function(){
             checked.push($(this).val());
         });
         console.log(checked);
-    });
+    });*/
 
 
 </script>

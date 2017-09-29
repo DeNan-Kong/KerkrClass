@@ -14,7 +14,7 @@ function createGridVideos() {
         queryParams : {
             'orgId' : $("#orgId").val(),
         },
-        rowNumbers: true,
+        rownumbers: true,
         loadMsg : '正在努力为您查找中……',
         idField : 'id',
         singleSelect : true,
@@ -78,13 +78,30 @@ function createGridVideos() {
                 return '<a href="#" onclick="del(' +rec.id+ ')" class="btn btn-danger" id="del-' + rec.id +'"><i class="fa fa-times"></i></a>';
                 //return '<a href="toUpdateVideoOrg.jspx" class="btn btn-danger"></a>';
             }
-
+        },{
+            field : 'watchAuthor',
+            title : '观看权限',
+            width : '10%',
+            hidden:'true'
         } ] ],
         onClickRow: function (rowIndex,data){
             $("#title").val(data.title);
             $("#description").val(data.description);
             $("#k-grade").val(data.grade);
             $("#k-id").val(data.id);
+
+            //console.log(data.watchAuthor);
+            if(data.watchAuthor == 1){
+                $("[name='k-type']").prop("checked",true);//全选
+            }else if(data.watchAuthor == 2){
+                $("#k-type-2").prop("checked",true);
+                $("#k-type-3").prop("checked",false);
+            }else if(data.watchAuthor == 3){
+                $("#k-type-3").prop("checked",true);
+                $("#k-type-2").prop("checked",false);
+            }else {
+                $("[name='k-type']").prop("checked",false);
+            }
 
             //alert(JSON.stringify(data));
             //var row = $('#videos-list').datagrid('getSelected');

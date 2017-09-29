@@ -12,7 +12,8 @@
         title AS title,
         description AS description,
         create_time AS createTime,
-        grade AS grade
+        grade AS grade,
+        watch_author AS watchAuthor
         FROM ke_videos
         WHERE org_id = #{orgId} AND status = 1
         <choose>
@@ -29,9 +30,9 @@
         <if test="grade != null">
             AND grade = #{grade}
         </if>
-        <if test="page != null and size != null">
+        <if test="start != null and size != null">
             LIMIT
-            #{page},#{size}
+            #{start},#{size}
         </if>
     </select>
 

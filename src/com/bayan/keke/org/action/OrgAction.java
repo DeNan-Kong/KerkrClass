@@ -733,8 +733,8 @@ public class OrgAction extends BaseAction implements
                 json.element("result", "fail");
                 print(json);
             } else {
-                //类型(0:试用,1:充值,2:在校生,3:网校生,4:申请中)
-                if( KeCommon.TYPE_APPLY.equals(keOrg.getType()) ){
+                //类型(0:试用,1:充值,2:在校生,3:网校生,4:申请中,5:申请未通过)
+                if( KeCommon.TYPE_NOPASS.equals(keOrg.getType()) ){
 
                 }else {
                     keOrg.setOnType(Integer.valueOf(keOrg.getType()) );
