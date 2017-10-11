@@ -59,37 +59,37 @@ public class KeCommon {
     public static final String DELIMITER = "/";
     
     /** ==========课课小教室测试环境====start===========*/
-    //极光推送测试环境
-    private static final boolean APNS_PRODUCTION = false;
-    // 七牛作业域名
-    public static final String QINIU_URL = "http://testqiniu.kerkr.com";
-    // 七牛作业空间
-    public static final String QINIU_BUCKET = "testkerkr";
-	// 七牛视频空间
-    public static final String QINIU_VIDEO_BUCKET = "test-class-video";
-    // 七牛视频域名
-    public static final String QINIU_VIDEO_DOMIN = "http://ovhr8lih9.bkt.clouddn.com/";
-    // 七牛域名:头像
-    private static final String QINIU_HEAD = "http://testqiniu.kerkr.com";
-    // 七牛空间:头像
-    public static final String QINIU_BUCKET_HEADURL = "testkerkr";
+//    //极光推送测试环境
+//    private static final boolean APNS_PRODUCTION = false;
+//    // 七牛作业域名
+//    public static final String QINIU_URL = "http://testqiniu.kerkr.com";
+//    // 七牛作业空间
+//    public static final String QINIU_BUCKET = "testkerkr";
+//	// 七牛视频空间
+//    public static final String QINIU_VIDEO_BUCKET = "test-class-video";
+//    // 七牛视频域名
+//    public static final String QINIU_VIDEO_DOMIN = "http://ovhr8lih9.bkt.clouddn.com/";
+//    // 七牛域名:头像
+//    private static final String QINIU_HEAD = "http://testqiniu.kerkr.com";
+//    // 七牛空间:头像
+//    public static final String QINIU_BUCKET_HEADURL = "testkerkr";
     /** ==========课课小教室测试环境====end=============*/
     
     /** ==========课课小教室发布环境====start===========*/
-//    //极光推送发布环境
-//    private static final boolean APNS_PRODUCTION = true;
-//	//七牛作业域名
-//    public static final String QINIU_URL = "http://workclass.kerkr.com";
-//    // 七牛空间
-//    public static final String QINIU_BUCKET = "workclass";
-//	// 七牛视频空间
-//	public static final String QINIU_VIDEO_BUCKET = "test-class-video";
-//	// 七牛视频域名
-//	public static final String QINIU_VIDEO_DOMIN = "http://ovhr8lih9.bkt.clouddn.com/";
-//	//七牛域名:头像
-//    private static final String QINIU_HEAD = "http://headclass.kerkr.com";
-//    // 七牛空间:头像
-//    public static final String QINIU_BUCKET_HEADURL = "headclass";
+    //极光推送发布环境
+    private static final boolean APNS_PRODUCTION = true;
+	//七牛作业域名
+    public static final String QINIU_URL = "http://workclass.kerkr.com";
+    // 七牛空间
+    public static final String QINIU_BUCKET = "workclass";
+	// 七牛视频空间
+	public static final String QINIU_VIDEO_BUCKET = "test-class-video";
+	// 七牛视频域名
+	public static final String QINIU_VIDEO_DOMIN = "http://ovhr8lih9.bkt.clouddn.com/";
+	//七牛域名:头像
+    private static final String QINIU_HEAD = "http://headclass.kerkr.com";
+    // 七牛空间:头像
+    public static final String QINIU_BUCKET_HEADURL = "headclass";
     /** ==========课课小教室发布环境====end=============*/
     
     //==================================================================================//
@@ -100,34 +100,34 @@ public class KeCommon {
 //    private static final String QINIU_URL = "http://testqiniu.kerkr.com";
 //    // 七牛空间
 //    public static final String QINIU_BUCKET = "testkerkr";
-    // 批改作业支付宝回调URL
-    public static final String ALIPAY_NOTIFY_URL = "http://test.kerkr.com.cn:9000/kerkr/alipayNotifyManage.jspx";
-    // 推广老师支付宝回调URL
-    public static final String ALIPAY_NOTIFY_TG_URL = "http://test.kerkr.com.cn:9000/kerkr/alipayNotifyTgManage.jspx";
-	// 学生充值支付宝回调URL
-	public static final String ALIPAY_DIRECT_NOTIFY_URL = "http://test.kerkr.com.cn:9000/kerkr/alipayDirectPay.jspx";
-	// 学生充值微信支付回调URL
-	public static final String WX_NOTIFY_URL = "http://test.kerkr.com.cn:9000/kerkr/onRespPay.jspx";
+//    // 批改作业支付宝回调URL
+//    public static final String ALIPAY_NOTIFY_URL = "http://test.kerkr.com.cn:9000/kerkr/alipayNotifyManage.jspx";
+//    // 推广老师支付宝回调URL
+//    public static final String ALIPAY_NOTIFY_TG_URL = "http://test.kerkr.com.cn:9000/kerkr/alipayNotifyTgManage.jspx";
+//	// 学生充值支付宝回调URL
+//	public static final String ALIPAY_DIRECT_NOTIFY_URL = "http://test.kerkr.com.cn:9000/kerkr/alipayDirectPay.jspx";
+//	// 学生充值微信支付回调URL
+//	public static final String WX_NOTIFY_URL = "http://test.kerkr.com.cn:9000/kerkr/onRespPay.jspx";
 //    //极光推送测试环境
 //    private static final boolean APNS_PRODUCTION = false;
     /** ==========测试环境====start===========*/
     
-//    /** ==========发布环境====start===========*/
+    /** ==========发布环境====start===========*/
 //    // 七牛域名:作业
 //    private static final String QINIU_URL = "http://qiniu.kerkr.com";
 //    // 七牛空间:作业
 //    public static final String QINIU_BUCKET = "kerkr";
-////    // 批改作业支付宝回调URL
-//	public static final String ALIPAY_NOTIFY_URL = "http://ios.kerkr.com/kerkr/alipayNotifyManage.jspx";
-//	// 推广老师支付宝回调URL
-//	public static final String ALIPAY_NOTIFY_TG_URL = "http://ios.kerkr.com/kerkr/alipayNotifyTgManage.jspx";
-//	// 学生充值支付宝回调URL
-//	public static final String ALIPAY_DIRECT_NOTIFY_URL = "http://ios.kerkr.com/kerkr/alipayDirectPay.jspx";
-//	// 学生充值微信支付回调URL
-//	public static final String WX_NOTIFY_URL = "http://ios.kerkr.com/kerkr/onRespPay.jspx";
+    // 批改作业支付宝回调URL
+	public static final String ALIPAY_NOTIFY_URL = "http://ios.kerkr.com/kerkr/alipayNotifyManage.jspx";
+	// 推广老师支付宝回调URL
+	public static final String ALIPAY_NOTIFY_TG_URL = "http://ios.kerkr.com/kerkr/alipayNotifyTgManage.jspx";
+	// 学生充值支付宝回调URL
+	public static final String ALIPAY_DIRECT_NOTIFY_URL = "http://ios.kerkr.com/kerkr/alipayDirectPay.jspx";
+	// 学生充值微信支付回调URL
+	public static final String WX_NOTIFY_URL = "http://ios.kerkr.com/kerkr/onRespPay.jspx";
 //    //极光推送发布环境
 //    private static final boolean APNS_PRODUCTION = true;
-//    /** ==========发布环境====end===========*/
+    /** ==========发布环境====end===========*/
     
 //    // 云信白板 正式版
 //    private static final String APP_KEY = "d7e8297e43ab64f5c8966318288b33be";// 开发者平台appKey

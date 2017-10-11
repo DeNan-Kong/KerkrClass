@@ -85,7 +85,7 @@
 		password as password,
 		org_id as orgId,
 		type as type,
-		grade as grage,
+		grade as grade,
 		head_url as headUrl,
 		city_code as cityCode,
 		province_code  as provinceCode

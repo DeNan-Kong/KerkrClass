@@ -2,6 +2,14 @@
 /*global plupload */
 /*global FileProgress */
 /*global hljs */
+var checked = new Array();
+$(".watch-author").click(function(){
+    checked = [];
+    $('input[name="k-type"]:checked').each(function(){
+        checked.push($(this).val());
+    });
+    console.log(checked);
+});
 
 $(function () {
     var uploader = Qiniu.uploader({
@@ -86,14 +94,6 @@ $(function () {
             },
             'FileUploaded': function (up, file, info) {
                 var res = $.parseJSON(info.response);
-                var checked = [];
-                $(".watch-author").click(function(){
-                    checked = [];
-                    $('input[name="k-type"]:checked').each(function(){
-                        checked.push($(this).val());
-                    });
-                    //console.log(checked);
-                });
                 var data = {
                     "orgId":$('#orgId').val(),
                     "title": $('#title').val(),
@@ -103,7 +103,7 @@ $(function () {
                     "hash": res.hash,
                     "fsize": res.fsize,
                     "length": parseInt(res.length),
-                    "checkboxValue": checked
+                    "checkboxValue": checked.toString()
                 }
                 $.ajax({
                     url:'uploadCallBackVideos.jspx',
