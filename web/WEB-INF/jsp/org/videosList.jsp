@@ -36,7 +36,7 @@
                     <select id="k-grade" name="grade" class="show-tick form-control ">
                         <option value="01">一年级</option>
                         <option value="02">二年级</option>
-                        <option value="02">三年级</option>
+                        <option value="03">三年级</option>
                         <option value="04">四年级</option>
                         <option value="05">五年级</option>
                         <option value="06">六年级</option>

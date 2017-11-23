@@ -6,10 +6,14 @@ $(function() {
 		var orgAddress = $('#orgAddress').val();
 		var password = $('#password').val();
 
-		if(orgPhoneNumber == null || orgPhoneNumber == ""){
-			alert('请输入手机号');
-			return;
-		}
+        var reg = /^1[34578]\d{9}$/;
+        if(orgPhoneNumber == null || orgPhoneNumber == ""){
+            alert('请输入手机号');
+            return;
+        }else if( !reg.test(orgPhoneNumber)){
+            alert("手机号码格式不正确");
+            return;
+        }
 		if(orgName == null || orgName == ""){
 			alert('请输入机构名');
 			return;

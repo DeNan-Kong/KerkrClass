@@ -80,7 +80,23 @@ function createGridStudent(gradezero) {
 					return "";
 				}
 			}
-		},{
+		}, {
+            field : 'type',
+            title : '学生状态',
+            width : '15%',
+            align : 'center',
+            formatter : function(val, rec){
+                if(val == '0'){
+                    return "正常";
+                }else if(val == '4'){
+                    return "申请中";
+                }else if(val == '5'){
+                    return "申请未通过";
+                }else {
+                	return "火星学生";
+				}
+            }
+        }, {
 			field : 'onType',
 			title : '学生类型',
 			width : '15%',

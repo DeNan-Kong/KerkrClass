@@ -7,14 +7,14 @@ $(function() {
 		var teaGrade = $('#teaGrade').val();
 		var password = $('#password').val();
 
-		if(teaPhone == null || teaPhone == ""){
-			alert('请输入手机号');
-			return;
-		}
-		if(teaName == null || teaName == ""){
-			alert('请输入姓名');
-			return;
-		}
+        var reg = /^1[34578]\d{9}$/;
+        if(teaPhone == null || teaPhone == ""){
+            alert('请输入手机号');
+            return;
+        }else if( !reg.test(teaPhone)){
+            alert("手机号码格式不正确");
+            return;
+        }
 		if(teaSubject == null || teaSubject == ""){
 			alert('请输入科目');
 			return;

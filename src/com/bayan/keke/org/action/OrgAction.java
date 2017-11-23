@@ -7,6 +7,7 @@ import java.util.Map;
 import javax.annotation.Resource;
 
 import com.bayan.keke.action.KeCommon;
+import com.bayan.keke.util.KeConstant;
 import com.bayan.keke.util.Md5Util;
 import org.apache.log4j.Logger;
 
@@ -336,6 +337,7 @@ public class OrgAction extends BaseAction implements
             keUser.setGrade(keOrg.getGrade());
             keUser.setOrgId(orgId);
             keUser.setPassword(keOrg.getPassword());
+            keUser.setOnType(keOrg.getOnType());
 
             // 首次注册的昵称为：课课
             keUser.setNickName(keOrg.getUserName());
@@ -416,8 +418,10 @@ public class OrgAction extends BaseAction implements
                 return;
             }
             keOrg.setUserId(keOrg.getPhoneNumber());
-            keOrg.setOrgId(KeCommon.ORGID_TEST);//明之算测试
-            //keOrg.setOrgId(KeCommon.ORGID_MINGZS);//明之算机构
+            keOrg.setOrgId(KeCommon.ORGID_MINGZS);//明之算机构
+            keOrg.setType(KeCommon.TYPE_APPLY);//未审核
+
+
             String phone = keOrg.getPhoneNumber();
             KeUser keUser = new KeUser();
             keUser.setPhoneNumber(phone);
@@ -436,7 +440,7 @@ public class OrgAction extends BaseAction implements
             // 设置设备的用途：0学生,1老师
             keUser.setFlag("0");
             // 用户类型(0:试用,1:充值,2:在校生,3:网校生,4:未审核)
-            keUser.setType("4");
+            keUser.setType(KeCommon.TYPE_APPLY);
 
             // 判断该用户是否已注册
             KeUser reg = userService.regist(keUser);
@@ -503,7 +507,7 @@ public class OrgAction extends BaseAction implements
             JSONObject json = new JSONObject();
 
             // 删除学生
-            keOrg.setOrgId("");
+            keOrg.setOrgId(null);
             Integer rst = orgService.updateStuInfo(keOrg);
             if (rst == 1) {
                 json.element("result", "success");

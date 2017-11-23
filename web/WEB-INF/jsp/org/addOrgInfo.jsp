@@ -5,7 +5,7 @@
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<title>机构信息</title>
-		<script type="text/javascript" src="./js/org/addOrgInfo.js"></script>
+		<script type="text/javascript" src="/js/org/addOrgInfo.js"></script>
 		<script type="text/javascript" src="${pageContext.servletContext.contextPath }/js/jQuery.md5.js"></script>
 	</head>
 	<body>

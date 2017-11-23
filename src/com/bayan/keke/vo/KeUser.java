@@ -104,6 +104,9 @@ public class KeUser implements java.io.Serializable {
 
 	// 所属机构
 	private String orgId;
+
+	//学生在校类型
+	private Integer onType;
 	
 	/** default constructor */
 	public KeUser() {
@@ -432,5 +435,13 @@ public class KeUser implements java.io.Serializable {
 
 	public void setType(String type) {
 		this.type = type;
-	}	
+	}
+
+	public Integer getOnType() {
+		return onType;
+	}
+
+	public void setOnType(Integer onType) {
+		this.onType = onType;
+	}
 }

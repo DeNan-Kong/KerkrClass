@@ -100,8 +100,10 @@ public class KeCommon {
 //    private static final String QINIU_URL = "http://testqiniu.kerkr.com";
 //    // 七牛空间
 //    public static final String QINIU_BUCKET = "testkerkr";
+//	//机构ID
+//	public static final String ORGID_MINGZS = "K20002";
 //    // 批改作业支付宝回调URL
-//    public static final String ALIPAY_NOTIFY_URL = "http://test.kerkr.com.cn:9000/kerkr/alipayNotifyManage.jspx";
+//    public static final String ALIPAY_NOTIFY_URL = "http://test.kerkr.com.cn:9001/kerkr/alipayNotifyManage.jspx";
 //    // 推广老师支付宝回调URL
 //    public static final String ALIPAY_NOTIFY_TG_URL = "http://test.kerkr.com.cn:9000/kerkr/alipayNotifyTgManage.jspx";
 //	// 学生充值支付宝回调URL
@@ -117,6 +119,8 @@ public class KeCommon {
 //    private static final String QINIU_URL = "http://qiniu.kerkr.com";
 //    // 七牛空间:作业
 //    public static final String QINIU_BUCKET = "kerkr";
+	//机构ID
+	public static final String ORGID_MINGZS = "K20002";
     // 批改作业支付宝回调URL
 	public static final String ALIPAY_NOTIFY_URL = "http://ios.kerkr.com/kerkr/alipayNotifyManage.jspx";
 	// 推广老师支付宝回调URL
@@ -178,8 +182,7 @@ public class KeCommon {
 
 	/** ==========学生用户配置====start=============*/
 	//机构ID
-	public static final String ORGID_TEST = "K20012";
-	public static final String ORGID_MINGZS = "K20002";
+	//public static final String ORGID_MINGZS = "K20002";
 	//类型(0:试用,1:充值,2:在校生,3:网校生,4:申请中,5:申请未通过)
 	public static final String TYPE_TRY = "0";
 	public static final String TYPE_PAY = "1";

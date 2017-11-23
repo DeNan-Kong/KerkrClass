@@ -32,16 +32,20 @@
     <update id="updateStuInfo" parameterType="org">
         UPDATE ke_user
         SET org_id = #{orgId},
-        type = #{type}
+        on_type=#{onType},
+        <if test="type != null">
+            type = #{type},
+        </if>
         <if test="userName != null">
-            , user_name=#{userName}
+            user_name=#{userName},
         </if>
         <if test="grade != null">
-            , grade=#{grade}
+            grade=#{grade},
         </if>
         <if test="password != null">
-            , password=#{password}
+            password=#{password},
         </if>
+        update_time = now()
         WHERE user_id=#{userId}
     </update>
 
