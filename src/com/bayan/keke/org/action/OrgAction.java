@@ -428,6 +428,7 @@ public class OrgAction extends BaseAction implements
             keUser.setOrgId(keOrg.getOrgId());
             String defaultPwd = phone.substring(phone.length() - 6, phone.length());
             keUser.setPassword(Md5Util.md5(defaultPwd));
+            //地址
             keUser.setAddress(keOrg.getAddress());
             // 首次注册的昵称为：课课
             keUser.setNickName(keOrg.getUserName());
