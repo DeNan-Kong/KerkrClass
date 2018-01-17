@@ -123,6 +123,17 @@ public class VideosAction extends BaseAction implements
 
         } else {
             try {
+                KeVideos videos = videosService.getOrgId(keVideos.getUserId());
+                Boolean watch =false;
+                if(videos.getWatchAuthor() != null){
+                    Integer watchAuthor = Integer.parseInt(videos.getWatchAuthor());
+                    watch = (watchAuthor==1 || watchAuthor==3);
+                }
+                if(videos.getOrgId() != null & videos.getGrade() != null){
+                    keVideos.setOrgId(videos.getOrgId());
+                    keVideos.setGrade(videos.getGrade());
+                    //keVideos.setWatchAuthor(videos.getWatchAuthor());
+                }
                 List<Map> videosList = videosService.getVideosInfo(keVideos);
                 for(Map m: videosList){
                     if(m.containsKey("videoUrl") ){
@@ -137,7 +148,7 @@ public class VideosAction extends BaseAction implements
                 JSONObject json = new JSONObject();
                 json.element("code", 1000);
                 json.element("videoList", JSONArray.fromObject(videosList));
-
+                json.element("watch",watch);
                 print(json.toString());
                 printEndLog("获取视频列表方法结束", json.toString(), logger);
             } catch (Exception e) {

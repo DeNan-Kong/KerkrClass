@@ -1,36 +1,32 @@
 $(function() {
 	createGridStudent();
-	// 查询
-	$('#go').click(function(){
-		var gradezero=$('#gradezero').val();
-		// var type=$('#type').val();
-		createGridStudent(gradezero);
-	});
-	
-	// 年级变换
-	$('#changgo').click(function(){
-		var gradeone=$('#gradeone').val();
-		var gradetwo=$('#gradetwo').val();
-		// var type=$('#type').val();
-		updateGrade(gradeone,gradetwo);
-	});
-	
 });
 
-function updateGrade(gradeone,gradetwo) {
-	$.post('changGradeOrg.jspx', {
-		'gradeone' : gradeone,
-		'gradetwo' : gradetwo
-	}, function(data) {
-		if (data.code=="1000") {
-			alert('年级变换成功！');
-		}else{
-			alert(data.message);
-		}
-	}, 'json');
-}
+// 查询
+$('#go').click(function(){
+    createGridStudent();
+});
+// 年级变换
+$('#changgo').click(function(){
+    var gradeone=$('#gradeone').val();
+    var gradetwo=$('#gradetwo').val();
+    $.post('changGradeOrg.jspx', {
+        'gradeone' : gradeone,
+        'gradetwo' : gradetwo
+    }, function(data) {
+        if (data.code=="1000") {
+            createGridStudent();
+            alert('年级变换成功！');
+        }else{
+            alert(data.message);
+        }
+    }, 'json');
+});
 
-function createGridStudent(gradezero) {
+function createGridStudent() {
+    var grade =$('#gradezero').val();
+    var phoneNumber =$('#phoneNumber').val();
+    var userName =$('#userName').val();
 	
 	$('#teh_grid').datagrid( {
 		pagination : true,
@@ -42,7 +38,9 @@ function createGridStudent(gradezero) {
 		striped : true,
 		fit : true,
 		queryParams : {
-			'grade' : gradezero
+			grade : grade,
+            phoneNumber : phoneNumber,
+			userName : userName
 		},
 		rownumbers:true,
 		loadMsg : '正在努力为您查找中……',
@@ -61,7 +59,7 @@ function createGridStudent(gradezero) {
 		},{
 			field : 'grade',
 			title : '年级',
-			width : '15%',
+			width : '8%',
 			align : 'center',
 			formatter : function(val, rec){
 				if(val == "01"){
@@ -83,7 +81,7 @@ function createGridStudent(gradezero) {
 		}, {
             field : 'type',
             title : '学生状态',
-            width : '15%',
+            width : '10%',
             align : 'center',
             formatter : function(val, rec){
                 if(val == '0'){
@@ -99,32 +97,51 @@ function createGridStudent(gradezero) {
         }, {
 			field : 'onType',
 			title : '学生类型',
-			width : '15%',
+			width : '10%',
 			align : 'center',
             formatter : function(val, rec){
-                if(val == 2){
-                    return "在校生";
+                if(val == 1){
+                    return "面授生+寒假网课";
+                }else if(val == 2){
+                    return "面授生-寒假网课";
                 }else if(val == 3){
-                    return "网校生";
+                    return "网校生+寒假网课";
+                }else if(val == 4){
+                    return "网校生-寒假网课";
                 }else{
-                    return "-";
+                    return "其他";
                 }
             }
 		}, {
+			field : 'address',
+			title : '地址',
+			width : '25%',
+			align : 'center'
+		}, {
 			field : 'createTime',
 			title : '注册时间',
-			width : '20%',
+			width : '10%',
 			align : 'center'
 		}, {
 			field : '_operate',
 			title : '操作',
-			width : '100',
+			width : '10%',
 			align : 'center',
 			formatter : function(val, rec) {
-				return '<input type="button" style="background-color: #FF8888;border-width:1px;height:23px;width:50px;" '+
-				'onclick=delStudent("'+rec.userId+'") value="删除" id="' + rec.userId +'"/>';
+				var addrVal = "";
+                if(typeof(rec.address) != "undefined"){
+                    addrVal = rec.address;
+                    //console.log(addrVal);
+				}
+				var delHtml = '<input type="button" class="btn btn-danger" style="margin: 5px" '+
+                    'onclick=delStudent("'+rec.userId+'") value="删除" id="' + rec.userId +'"/>';
+
+				var updateHtml = '<input type="button" class="btn btn-info" style="margin: 5px" ' +
+                'onclick= "initModal(\'' + rec.id + '\',\'' + rec.name + '\',\'' + rec.phoneNumber + '\',\'' + rec.grade +
+					'\',\'' + rec.onType +'\',\'' + addrVal +'\')" value="更新"/>';
+				return delHtml + updateHtml ;
 			}
-		} ] ]
+		}] ]
 	});
 }
 
@@ -135,11 +152,50 @@ function delStudent(userId){
 		'userId' : userId
 	}, function(data) {
 		if (data.result == "success") {
+            createGridStudent();
 			alert("删除成功");
-			$('#'+userId).attr("disabled","true");
-			$('#'+userId).css("background-color","#DDDDDD");
 		}else{
 			alert("删除失败")
 		}
 	}, 'json');
 }
+
+function initModal(id,name,phoneNumber,grade,onType,address) {
+    console.log(name + phoneNumber + grade+ onType+address);
+
+    $("#uid").val(id);
+    $("#updName").val(name);
+    $("#updPhone").val(phoneNumber);
+    $("#updGrade").val(grade);
+    $("#onType").val(onType);
+	$("#address").val(address);
+
+    $('#myModal').modal('show');          // 初始化后立即调用 show 方法
+};
+
+$('#update').click(function () {
+	var id = $("#uid").val();
+	var userName = $("#updName").val();
+	var grade = $("#updGrade").val();
+	var phoneNumber = $("#updPhone").val();
+	var onType = $("#onType").val();
+	var address = $("#address").val();
+
+	$.post('updateStudentOrg.jspx', {
+		id : id,
+        userName : userName,
+        grade : grade,
+        phoneNumber : phoneNumber,
+        onType : onType,
+        address : address
+	}, function(data) {
+		if (data.result == "success") {
+            createGridStudent();
+            $('#myModal').modal('hide');
+			//alert("更新成功");
+		}else{
+			alert("更新失败")
+		}
+	}, 'json');
+});
+

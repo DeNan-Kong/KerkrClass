@@ -313,9 +313,7 @@ public class OrgAction extends BaseAction implements
      * 添加学生
      */
     public void addStudent() {
-
         try {
-
             printStartLog("addStudent方法开始", logger);
             printParamsLog("请求参数。", logger);
             if (CheckUtil.checkNulls(
@@ -338,7 +336,7 @@ public class OrgAction extends BaseAction implements
             keUser.setOrgId(orgId);
             keUser.setPassword(keOrg.getPassword());
             keUser.setOnType(keOrg.getOnType());
-
+            keUser.setAddress(keOrg.getAddress());
             // 首次注册的昵称为：课课
             keUser.setNickName(keOrg.getUserName());
             // 首次注册的等级为：普通
@@ -430,7 +428,7 @@ public class OrgAction extends BaseAction implements
             keUser.setOrgId(keOrg.getOrgId());
             String defaultPwd = phone.substring(phone.length() - 6, phone.length());
             keUser.setPassword(Md5Util.md5(defaultPwd));
-
+            keUser.setAddress(keOrg.getAddress());
             // 首次注册的昵称为：课课
             keUser.setNickName(keOrg.getUserName());
             // 首次注册的等级为：普通
@@ -658,6 +656,8 @@ public class OrgAction extends BaseAction implements
         map.put("size", getRows());
         map.put("grade", keOrg.getGrade());
         map.put("orgId", getSession().getAttribute("userId").toString());
+        map.put("phoneNumber",keOrg.getPhoneNumber());
+        map.put("userName",keOrg.getUserName());
 
         try {
 
@@ -1021,5 +1021,39 @@ public class OrgAction extends BaseAction implements
      */
     public String toApplyList() {
         return "toApplyList";
+    }
+
+    /**
+     * 学生更新 20180116
+     */
+    public void updateStudent() {
+        printStartLog("方法开始updateStudent", logger);
+        printParamsLog("更新学生处理参数:", logger);
+
+        if (CheckUtil.isNullOrEmpty(keOrg.getId())) {
+            printDebugLog("学生UID为空", logger);
+            // 返回结果
+            JSONObject json = new JSONObject();
+            json.element("result", "fail");
+            print(json);
+            return;
+        }
+
+        try {
+            // 返回结果
+            JSONObject json = new JSONObject();
+            Integer rst = orgService.updateStuById(keOrg);
+            if (rst == 1) {
+                json.element("result", "success");
+            } else {
+                json.element("result", "fail");
+            }
+            print(json);
+
+            // 请求结束log
+            printEndLog("更新学生结束返回值:", json.toString(), logger);
+        } catch (Exception e) {
+            printSysErr(e, logger);
+        }
     }
 }

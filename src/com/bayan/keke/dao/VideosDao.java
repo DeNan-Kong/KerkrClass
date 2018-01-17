@@ -16,6 +16,10 @@ public class VideosDao extends BaseDao {
         return getSqlSession().selectList("videos.getVideosInfo",keVideos);
     }
 
+    public List<Map> getVideosAll(KeVideos keVideos) throws Exception{
+        return getSqlSession().selectList("videos.getVideosAll",keVideos);
+    }
+
     public KeVideos getOrgId(String userId) throws Exception{
         return getSqlSession().selectOne("videos.getOrgId",userId);
     }

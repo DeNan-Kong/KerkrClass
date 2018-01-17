@@ -6,10 +6,10 @@
 		keyProperty="id">
 		insert into ke_user 
 			(user_id,user_name,phone_number,password,head_url,
-			grade,city_code,province_code,user_level,type,org_id,create_time,on_type)
+			grade,city_code,province_code,user_level,type,org_id,create_time,on_type,address)
 		VALUE 
 			(#{phoneNumber},#{nickName},#{phoneNumber},#{password},
-			#{headUrl},#{grade},#{cityCode},#{provinceCode},#{stuLevel},#{type},#{orgId},NOW(),#{onType});
+			#{headUrl},#{grade},#{cityCode},#{provinceCode},#{stuLevel},#{type},#{orgId},NOW(),#{onType},#{address});
 		INSERT INTO ke_point
 			(user_id,point_all,create_time)
 		VALUES

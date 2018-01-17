@@ -210,4 +210,8 @@ public class OrgDao extends BaseDao {
 	public Integer checkApplyStu(KeOrg keOrg){
 		return this.getSqlSession().update("org.checkApplyStu",keOrg);
 	}
+
+	public Integer updateStuById(KeOrg keOrg){
+		return this.getSqlSession().update("org.updateStuById",keOrg);
+	}
 }

@@ -45,10 +45,23 @@
         <if test="password != null">
             password=#{password},
         </if>
+        <if test="address != null">
+            address=#{address},
+        </if>
         update_time = now()
         WHERE user_id=#{userId}
     </update>
-
+    <!--更新 by ID 20180116-->
+    <update id="updateStuById" parameterType="org">
+        UPDATE ke_user
+        SET user_name = #{userName},
+        grade = #{grade},
+        phone_number = #{phoneNumber},
+        on_type = #{onType},
+        address = #{address},
+        update_time = now()
+        WHERE id = #{id}
+    </update>
     <!-- 更新老师机构ID -->
     <update id="updateTeaInfo" parameterType="org">
         UPDATE ke_teacher
@@ -88,6 +101,15 @@
     <select id="countStudent" parameterType="org" resultType="int">
         SELECT count(1) FROM ke_user a
         WHERE a.org_id=#{orgId}
+        <if test="grade != ''">
+            AND a.grade=#{grade}
+        </if>
+        <if test="phoneNumber != ''">
+            AND a.phone_number=#{phoneNumber}
+        </if>
+        <if test="userName != ''">
+            AND a.user_name LIKE concat(concat('%',#{userName}),'%')
+        </if>
     </select>
     <!-- 查询老师人数 -->
     <select id="countTeacher" parameterType="org" resultType="int">
@@ -96,7 +118,7 @@
     </select>
     <!-- 查询学生明细 -->
     <select id="selStuList" parameterType="org" resultType="map">
-        SELECT CONCAT('U',a.id) id,
+        SELECT a.id ,
         a.user_id userId,
         a.user_name name,
         a.grade grade,
@@ -107,16 +129,24 @@
         c.city_name provinceName,
         a.type type,
         a.on_type onType,
-        '0' userType
+        '0' userType,
+        a.address
         FROM ke_user a
         LEFT JOIN ke_city b
         ON a.city_code=b.city_code
         LEFT JOIN ke_city c
         ON a.province_code=c.city_code
         WHERE a.org_id=#{orgId}
-        <if test="grade != null and grade != ''">
+        <if test="grade != ''">
             AND a.grade=#{grade}
         </if>
+        <if test="phoneNumber != ''">
+            AND a.phone_number=#{phoneNumber}
+        </if>
+        <if test="userName != ''">
+            AND a.user_name LIKE concat(concat('%',#{userName}),'%')
+        </if>
+        ORDER BY a.create_time DESC
         limit
         #{page},#{size}
     </select>
@@ -142,6 +172,7 @@
         LEFT JOIN ke_city c
         ON a.province_code=c.city_code
         WHERE a.org_id=#{orgId}
+        ORDER BY a.create_time DESC
         limit
         #{page},#{size}
     </select>

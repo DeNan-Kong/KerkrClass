@@ -97,6 +97,7 @@ public class UserAction extends BaseAction implements
                         keUser.setCityCode("910100");
                     }
                     //将学生信息注册
+                    keUser.getAddress();
                     Integer result = userService.add(keUser);
                     if (result > 0) {
                         //注册完成直接登录

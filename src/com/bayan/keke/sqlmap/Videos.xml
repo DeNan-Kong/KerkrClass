@@ -36,6 +36,29 @@
             #{start},#{size}
         </if>
     </select>
+    <!--modify 20180116-->
+    <select id="getVideosAll" resultType="map" parameterType="com.bayan.keke.vo.KeVideos">
+        SELECT
+        id AS id,
+        topic_img AS topicImg,
+        video_url AS videoUrl,
+        length AS length,
+        title AS title,
+        description AS description,
+        create_time AS createTime,
+        grade AS grade,
+        watch_author AS watchAuthor
+        FROM ke_videos
+        WHERE org_id = #{orgId} AND status = 1
+        <if test="grade != null">
+            AND grade = #{grade}
+        </if>
+        ORDER BY create_time DESC
+        <if test="start != null and size != null">
+            LIMIT
+            #{start},#{size}
+        </if>
+    </select>
 
     <select id="getOrgId" resultType="com.bayan.keke.vo.KeVideos" parameterType="string">
         SELECT

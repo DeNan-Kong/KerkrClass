@@ -107,7 +107,9 @@ public class KeUser implements java.io.Serializable {
 
 	//学生在校类型
 	private Integer onType;
-	
+
+	private String address;
+
 	/** default constructor */
 	public KeUser() {
 	}
@@ -443,5 +445,13 @@ public class KeUser implements java.io.Serializable {
 
 	public void setOnType(Integer onType) {
 		this.onType = onType;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
 	}
 }

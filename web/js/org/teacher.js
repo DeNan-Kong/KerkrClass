@@ -76,8 +76,9 @@ function createGridStudent() {
 			width : '100',
 			align : 'center',
 			formatter : function(val, rec) {
-				return '<input type="button" style="background-color: #FF8888;border-width: 1px;height:23px;width:50px;" '+
-				'onclick=delTeacher("'+ val +'") value="删除" id="' + val +'"/>';
+
+				return '<input type="button" class="btn btn-danger" style="margin: 5px" '+
+                    'onclick=delTeacher("'+val+'") value="删除"/>';
 			}
 		}  ] ]
 	});
@@ -90,9 +91,8 @@ function delTeacher(tid){
 		'teacherId' : tid
 	}, function(data) {
 		if (data.result == "success") {
+            createGridStudent();
 			alert("删除成功");
-			$('#'+tid).attr("disabled","true");
-			$('#'+tid).css("background-color","#DDDDDD");
 		}else{
 			alert("删除失败")
 		}

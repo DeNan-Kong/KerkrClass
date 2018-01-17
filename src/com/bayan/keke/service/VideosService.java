@@ -17,13 +17,8 @@ public class VideosService {
 	private VideosDao videosDao;
 
 	public List<Map> getVideosInfo(KeVideos keVideos) throws Exception{
-		KeVideos videos = videosDao.getOrgId(keVideos.getUserId());
-		if(videos.getOrgId() != null & videos.getGrade() != null){
-			keVideos.setOrgId(videos.getOrgId());
-			keVideos.setGrade(videos.getGrade());
-			keVideos.setWatchAuthor(videos.getWatchAuthor());
-		}
-		return videosDao.getVideosInfo(keVideos);
+
+		return videosDao.getVideosAll(keVideos);
 	}
 
 	public List<Map> getVideosToWeb(KeVideos keVideos) throws Exception{
@@ -82,5 +77,9 @@ public class VideosService {
 			src.setWatchAuthor("4");
 		}
 		return src;
+	}
+
+	public KeVideos getOrgId(String userId) throws Exception{
+		return videosDao.getOrgId(userId);
 	}
 }

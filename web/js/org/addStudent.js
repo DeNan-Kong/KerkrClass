@@ -6,6 +6,7 @@ $(function() {
 		var grade = $('#grade').val();
 		var password = $('#password').val();
 		var onType = $('#onType').val();
+		var address = $('#address').val();
 		console.log(phoneNumber.length);
 
         var reg = /^1[34578]\d{9}$/;
@@ -37,7 +38,8 @@ $(function() {
 			'userName' : userName,
 			'grade' : grade,
 			'password' : password,
-			'onType' : onType
+			'onType' : onType,
+			address : address
 		}, function(data) {
 			if (data.code=="1000") {
 				alert('添加成功！');

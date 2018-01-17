@@ -216,4 +216,8 @@ public class OrgService {
 	public Integer checkApplyStu(KeOrg keOrg) throws Exception{
 		return orgDao.checkApplyStu(keOrg);
 	}
+
+	public Integer updateStuById(KeOrg keOrg){
+		return orgDao.updateStuById(keOrg);
+	}
 }

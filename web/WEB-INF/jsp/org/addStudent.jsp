@@ -28,7 +28,6 @@
                 <select name="grade"
                     style="height: 40px; width: 30%; margin-bottom: 0px;"
                     id="grade">
-                    <option value=""></option>
                     <option value="01">一年级</option>
                     <option value="02">二年级</option>
                     <option value="03">三年级</option>
@@ -41,13 +40,21 @@
 		</div>
 		<div style="margin-left: 150px; margin-top: 40px;">
 			<div style="display:inline">
+				<font style="width:100px; height:40px; font-size:20px;font-weight:bold; float:left;margin-top:3px;">地址:</font>
+				<input type="text" id="address" name="address" style="height: 40px;width: 30%; margin-bottom: 2px;border:1px solid #c0c0c0;">
+			</div>
+		</div>
+		<div style="margin-left: 150px; margin-top: 40px;">
+			<div style="display:inline">
 				<font style="width:100px; height:40px; font-size:20px;font-weight:bold; float:left;margin-top:3px;">学生类型:</font>
 				<div class="main_input_box">
 					<select name="onType"
 							style="height: 40px; width: 30%; margin-bottom: 0px;"
 							id="onType">
-						<option value="2">在校生</option>
-						<option value="3">网校生</option>
+						<option value="1">面授生+寒假网课</option>
+						<option value="2">面授生-寒假网课</option>
+						<option value="3">网校生+寒假网课</option>
+						<option value="4">网校生-寒假网课</option>
 
 					</select>
 				</div>

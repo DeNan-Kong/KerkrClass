@@ -16,5 +16,32 @@
         <div class="col-md-6" style="height: 70%; width: 100%;">
             <div id="apply-grid" style="height: 20%; width: 70%; float: left;"></div>
         </div>
+        <div class="modal fade" id="apply-m" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" >
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="gridSystemModalLabel">审核为</h4>
+                    </div>
+                    <div class="modal-body">
+                            <div class="form-group">
+                                <label for="onType" class="control-label" style="text-align: center;width:20%">学生类型</label>
+                                <select class="form-control" id="onType" style="width:50%;display:inline-block">
+                                    <option value="1">面授生+寒假网课</option>
+                                    <option value="2">面授生-寒假网课</option>
+                                    <option value="3">网校生+寒假网课</option>
+                                    <option value="4">网校生-寒假网课</option>
+                                </select>
+                            </div>
+                            <input type="hidden" id="uid" />
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        <button type="button" class="btn btn-primary" id="sure">确定</button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
     </body>
 </html>

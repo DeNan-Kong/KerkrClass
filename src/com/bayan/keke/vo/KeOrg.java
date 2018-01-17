@@ -68,6 +68,8 @@ public class KeOrg implements java.io.Serializable {
 	//学生在校类型
 	private Integer onType;
 
+	private String address;
+
 	/** default constructor */
 	public KeOrg() {
 	}
@@ -97,11 +99,11 @@ public class KeOrg implements java.io.Serializable {
 	}
 
 	public String getPassword() {
-		return password;
+		return password ;
 	}
 
 	public void setPassword(String password) {
-		this.password = password;
+		this.password = password == null ? null : password.trim();
 	}
 
 	public String getUserId() {
@@ -222,5 +224,13 @@ public class KeOrg implements java.io.Serializable {
 
 	public void setOnType(Integer onType) {
 		this.onType = onType;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
 	}
 }

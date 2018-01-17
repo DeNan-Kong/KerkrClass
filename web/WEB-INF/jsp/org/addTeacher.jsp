@@ -42,7 +42,6 @@
                 <select name="teaGrade"
                     style="height: 40px; width: 30%; margin-bottom: 0px;"
                     id="teaGrade">
-                    <option value=""></option>
                     <option value="01">一年级</option>
                     <option value="02">二年级</option>
                     <option value="03">三年级</option>
