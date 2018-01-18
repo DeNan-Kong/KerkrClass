@@ -62,7 +62,7 @@ function createGridVideos() {
             align : 'center',
             formatter : function(val, rec) {
                 //console.log(JSON.stringify(rec));
-                return '<a href="'+ val +'" data-toggle="modal" class="btn btn-info" style="margin: 3px" target="_blank">查看</a>';
+                return '<a href="'+ val +'" class="btn btn-info" style="margin: 3px" target="_blank">查看</a>';
             }
         },{
             field : 'createTime',
