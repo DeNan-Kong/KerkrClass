@@ -132,7 +132,7 @@ public class VideosAction extends BaseAction implements
                 if(videos.getOrgId() != null & videos.getGrade() != null){
                     keVideos.setOrgId(videos.getOrgId());
                     keVideos.setGrade(videos.getGrade());
-                    //keVideos.setWatchAuthor(videos.getWatchAuthor());
+                    keVideos.setWatchAuthor(videos.getWatchAuthor());
                 }
                 List<Map> videosList = videosService.getVideosInfo(keVideos);
                 for(Map m: videosList){

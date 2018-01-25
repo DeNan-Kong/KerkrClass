@@ -52,7 +52,7 @@
             </div>
         </div>
 
-        <div class="form-group">
+        <div class="form-group" hidden>
             <label style="text-align: center;width:100px; display:inline-block">观看权限</label>
             <div class="dropdown" style="width:500px; display:inline-block" >
                 <%--<select id="k-type" name="k-type" class="show-tick form-control ">

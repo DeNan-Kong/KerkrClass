@@ -17,7 +17,7 @@ public class VideosService {
 	private VideosDao videosDao;
 
 	public List<Map> getVideosInfo(KeVideos keVideos) throws Exception{
-
+//		return videosDao.getVideosInfo(keVideos);
 		return videosDao.getVideosAll(keVideos);
 	}
 
@@ -26,7 +26,8 @@ public class VideosService {
 	}
 
 	public Boolean saveVideoInfo(KeVideos keVideos) throws Exception{
-		keVideos = changeValue(keVideos);
+		//keVideos = changeValue(keVideos);
+		keVideos.setWatchAuthor("1");
 		int res = videosDao.saveVideoInfo(keVideos);
 		if(res > 0)
 			return true;
@@ -49,7 +50,8 @@ public class VideosService {
 	 * @throws Exception
 	 */
 	public Boolean updateInfo(KeVideos keVideos) throws Exception{
-		keVideos = changeValue(keVideos);
+		//keVideos = changeValue(keVideos);
+		keVideos.setWatchAuthor("1");
 		int res = videosDao.updateInfo(keVideos);
 		if(res > 0)
 			return true;
