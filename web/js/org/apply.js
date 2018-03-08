@@ -1,5 +1,28 @@
 $(function () {
     createGridStudent();
+
+    //动态下拉菜单
+    $.ajax({
+        url:'getTagsListOrg.jspx',
+        type:'post', //GET
+        async:true,    //或false,是否异步
+        data: {},
+        timeout:5000,    //超时时间
+        dataType:'json',    //返回的数据格式：json/xml/html/script/jsonp/text
+        success:function(data,textStatus,jqXHR){
+            //var data = [{id: 1, text: '面授生'}, {id: 2, text: '网校生'}, {id: 3, text: '寒假网课'}];//下拉列表中的数据项
+            $("#watch-tags").select2({
+                placeholder: "请选择",
+                language: "zh-CN",
+                multiple: true,
+                maximumSelectionLength: 5,
+                data: data.rows,
+            });//启动select2
+            //console.log(data.total);
+        }
+    });
+    //数据回显
+    //$("#watch-tags").val([1,2]).trigger("change");
 });
 
 function createGridStudent() {
@@ -83,24 +106,34 @@ function checkStu(id, type) {
 
 $("#sure").click(function () {
     var id = $("#uid").val();
-    var type = $("#onType").val();
-    $.post('checkApplyStuOrg.jspx', {
-        'id': id,
-        'type': type
-    }, function (data) {
-        if (data.result == "success") {
-            $('#apply-m').modal('hide');
-            createGridStudent();
-        } else {
-            alert("审核不成功")
+    var tagIds = $('#watch-tags').val();
+
+    $.ajax({
+        type: 'post',
+        url: 'checkApplyStuOrg.jspx',
+        data: {
+            id: id,
+            type: 0,
+            tagIds : tagIds
+        },
+        cache: false,
+        dataType: 'json',
+        traditional: true,
+        success: function (data) {
+            if (data.result == "success") {
+                $('#apply-m').modal('hide');
+                createGridStudent();
+            } else {
+                alert("审核不成功")
+            }
         }
-    }, 'json');
+    });
 });
 
 function initModal(id ){
     console.log(id);
 
     $("#uid").val(id);
-
+    $("#watch-tags").val([]).trigger("change");
     $('#apply-m').modal('show');          // 初始化后立即调用 show 方法
 };

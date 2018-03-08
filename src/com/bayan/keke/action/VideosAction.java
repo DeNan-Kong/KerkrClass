@@ -25,6 +25,8 @@ import javax.annotation.Resource;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -98,6 +100,15 @@ public class VideosAction extends BaseAction implements
             }else{
                 String topicImgUrl = keVideos.getVideoUrl() + "?vframe/jpg/offset/7";//截取第七帧
                 keVideos.setTopicImg(topicImgUrl);
+                //观看标签持久化
+                String[] tagIds = keVideos.getTagIds();
+                if(tagIds.length >0 && !tagIds[0].isEmpty()){
+                    String watchTags="";
+                    for(String t:tagIds){
+                        watchTags += t + "#";
+                    }
+                    keVideos.setWatchAuthor(watchTags);
+                }
                 boolean res = videosService.saveVideoInfo(keVideos);
                 JSONObject j = new JSONObject();
                 j.element("result",res);
@@ -123,32 +134,63 @@ public class VideosAction extends BaseAction implements
 
         } else {
             try {
-                KeVideos videos = videosService.getOrgId(keVideos.getUserId());
+                KeVideos userInfo = videosService.getOrgId(keVideos.getUserId());
                 Boolean watch =false;
-                if(videos.getWatchAuthor() != null){
-                    Integer watchAuthor = Integer.parseInt(videos.getWatchAuthor());
-                    watch = (watchAuthor==1 || watchAuthor==3);
+
+                List<String> userTags = new ArrayList<String>();
+                if(userInfo.getWatchAuthor() != null){
+                    String[] tags = userInfo.getWatchAuthor().split("#");
+                    userTags = Arrays.asList(tags) ;
                 }
-                if(videos.getOrgId() != null & videos.getGrade() != null){
-                    keVideos.setOrgId(videos.getOrgId());
-                    keVideos.setGrade(videos.getGrade());
-                    keVideos.setWatchAuthor(videos.getWatchAuthor());
+                if(userInfo.getOrgId() != null & userInfo.getGrade() != null){
+                    keVideos.setOrgId(userInfo.getOrgId());
+                    keVideos.setGrade(userInfo.getGrade());
+                    //keVideos.setWatchAuthor(videos.getWatchAuthor());
                 }
+                List<Map> canWatchVideos = new ArrayList<Map>();
                 List<Map> videosList = videosService.getVideosInfo(keVideos);
                 for(Map m: videosList){
-                    if(m.containsKey("videoUrl") ){
-                        String qiniuUrl = KeCommon.getPubURL(m.get("videoUrl").toString());
-                        m.put("videoUrl",qiniuUrl);
+                    if(m.containsKey("watchAuthor")){
+                        String videoTags = m.get("watchAuthor").toString();
+                        List<String> videoTagsList = Arrays.asList(videoTags.split("#"));
+                        //标签匹配规则
+                        boolean canView =false;
+                        for(String tag : userTags){
+                            if(videoTags.contains(tag)){
+                                canView=true;
+                                break;
+                            }
+                        }
+//                        Boolean isContain = userTags.containsAll(videoTagsList);
+                        if(canView){
+                            if(m.containsKey("videoUrl") ){
+                                String qiniuUrl = KeCommon.getPubURL(m.get("videoUrl").toString());
+                                m.put("videoUrl",qiniuUrl);
+                            }
+                            if(m.containsKey("topicImg") ){
+                                String qiniuUrl = KeCommon.getPubURL(m.get("topicImg").toString());
+                                m.put("topicImg",qiniuUrl);
+                            }
+                            canWatchVideos.add(m);
+                        }
+
+                    }else {
+                        if(m.containsKey("videoUrl") ){
+                            String qiniuUrl = KeCommon.getPubURL(m.get("videoUrl").toString());
+                            m.put("videoUrl",qiniuUrl);
+                        }
+                        if(m.containsKey("topicImg") ){
+                            String qiniuUrl = KeCommon.getPubURL(m.get("topicImg").toString());
+                            m.put("topicImg",qiniuUrl);
+                        }
+                        canWatchVideos.add(m);
                     }
-                    if(m.containsKey("topicImg") ){
-                        String qiniuUrl = KeCommon.getPubURL(m.get("topicImg").toString());
-                        m.put("topicImg",qiniuUrl);
-                    }
+
                 }
                 JSONObject json = new JSONObject();
                 json.element("code", 1000);
-                json.element("videoList", JSONArray.fromObject(videosList));
-                json.element("watch",watch);
+                json.element("videoList", JSONArray.fromObject(canWatchVideos));
+                json.element("watch",true);
                 print(json.toString());
                 printEndLog("获取视频列表方法结束", json.toString(), logger);
             } catch (Exception e) {
@@ -191,10 +233,24 @@ public class VideosAction extends BaseAction implements
                 print("{\"code\":\"1005\",\"message\":\"参数异常\"}");
                 printErrorLog("传入的参数为空值,请参考参数日志", logger);
             } else {
+                //观看标签持久化
+                String[] tagIds = keVideos.getTagIds();
+                if(tagIds.length >0 && !tagIds[0].isEmpty()){
+                    String watchTags="";
+                    for(String t:tagIds){
+                        watchTags += t + "#";
+                    }
+                    keVideos.setWatchAuthor(watchTags);
+                }
                 boolean res = videosService.updateInfo(keVideos);
                 JSONObject json = new JSONObject();
-                json.element("code", 1000);
-                json.element("message", res);
+                if(res){
+                    json.element("code", 1000);
+                    json.element("message","更新成功");
+                }else {
+                    json.element("code", 1001);
+                    json.element("message","更新失败");
+                }
                 print(json);
             }
         } catch (Exception e) {

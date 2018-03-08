@@ -110,12 +110,15 @@
                                                    nav-n="首页,视频管理,/toVideosListOrg.jspx">
                                                     <i class="fa fa-angle-right"></i> <span>视频管理</span> </a>
                                             </li>
-
                                             <li class="active">
                                                 <a href="javascript:void(0)" class="active"
-                                                   nav-n="首页,修改密码,/toUpdatePwdOrg.jspx"> <i
-                                                        class="fa fa-angle-right"></i>
-                                                    <span>修改密码</span> </a>
+                                                   nav-n="首页,设置标签,/toWatchTagOrg.jspx">
+                                                    <i class="fa fa-angle-right"></i> <span>设置标签</span> </a>
+                                            </li>
+                                            <li class="active">
+                                                <a href="javascript:void(0)" class="active"
+                                                   nav-n="首页,修改密码,/toUpdatePwdOrg.jspx">
+                                                    <i class="fa fa-angle-right"></i> <span>修改密码</span> </a>
                                             </li>
                                             <li class="active">
                                                 <a href="logoutOrg.jspx" class="active">

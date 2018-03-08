@@ -154,7 +154,7 @@ public class OrgDao extends BaseDao {
 	
 	/**
 	 * 将学生机构ID改为空
-	 * 
+	 *
 	 * @param keTeaSub
 	 * @return
 	 * @throws Exception
@@ -213,5 +213,25 @@ public class OrgDao extends BaseDao {
 
 	public Integer updateStuById(KeOrg keOrg){
 		return this.getSqlSession().update("org.updateStuById",keOrg);
+	}
+
+	public Integer countWatchTag(Map map){
+		return this.getSqlSession().selectOne("org.countWatchTag",map);
+	}
+
+	public List<Map> getWatchTagList(Map map){
+		return this.getSqlSession().selectList("org.getWatchTagList",map);
+	}
+
+	public Integer updateWatchTag(Map map){
+		return this.getSqlSession().update("org.updateWatchTag",map);
+	}
+
+	public Integer addWatchTag(Map map){
+		return this.getSqlSession().insert("org.addWatchTag",map);
+	}
+
+	public List<Map> selectWatchTagForName(String tagName){
+		return this.getSqlSession().selectList("org.selectWatchTagForName",tagName);
 	}
 }

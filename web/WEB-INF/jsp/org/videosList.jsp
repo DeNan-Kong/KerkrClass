@@ -43,18 +43,13 @@
                     </select>
                 </div>
             </div>
-            <div class="form-group" hidden>
-                <label style="text-align: center;width:100px; display:inline-block">观看权限</label>
+            <div class="form-group">
+                <label style="text-align: center;width:100px; display:inline-block">标签</label>
                 <div class="dropdown" style="width:500px; display:inline-block" >
-                    <%--<select id="k-type" name="k-type" class="show-tick form-control ">
-                    </select>--%>
-                    <label style="font-weight: normal" class="watch-author">
-                        <input type="checkbox" name="k-type" value="2" id="k-type-2">
-                        在校生</label>
-                    <label style="font-weight: normal;margin-left: 50px" class="watch-author">
-                        <input type="checkbox" name="k-type" value="3" id="k-type-3">
-                        网校生</label>               
+                    <select id="watch-tags" name="watch-tags" class="show-tick form-control">
+                    </select>
                 </div>
+                <span style="display:inline-block;color: red"> Tips : 含有任意一个标签的用户即可观看</span>
             </div>
 
             <input type="hidden" name="id" id="k-id"/>

@@ -5,8 +5,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
         <title>新申请信息</title>
-        <script
-            src="${pageContext.request.contextPath}/js/org/apply.js"
+        <script src="${pageContext.request.contextPath}/js/org/apply.js"
             type="text/javascript"></script>
     </head>
     <body>
@@ -25,12 +24,8 @@
                     </div>
                     <div class="modal-body">
                             <div class="form-group">
-                                <label for="onType" class="control-label" style="text-align: center;width:20%">学生类型</label>
-                                <select class="form-control" id="onType" style="width:50%;display:inline-block">
-                                    <option value="1">面授生+寒假网课</option>
-                                    <option value="2">面授生-寒假网课</option>
-                                    <option value="3">网校生+寒假网课</option>
-                                    <option value="4">网校生-寒假网课</option>
+                                <label for="watch-tags" class="control-label" style="text-align: center;width:20%">学生类型</label>
+                                <select class="form-control" id="watch-tags" style="width:50%;display:inline-block">
                                 </select>
                             </div>
                             <input type="hidden" id="uid" />

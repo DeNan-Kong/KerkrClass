@@ -64,7 +64,7 @@
         SELECT
           org_id AS orgId,
           grade AS grade,
-          on_type AS watchAuthor
+          watch_tags AS watchAuthor
         FROM ke_user WHERE user_id = #{userId}
     </select>
 

@@ -1,5 +1,28 @@
 $(function() {
 	createGridStudent();
+
+    //动态下拉菜单
+    $.ajax({
+        url:'getTagsListOrg.jspx',
+        type:'post', //GET
+        async:true,    //或false,是否异步
+        data: {},
+        timeout:5000,    //超时时间
+        dataType:'json',    //返回的数据格式：json/xml/html/script/jsonp/text
+        success:function(data,textStatus,jqXHR){
+            //var data = [{id: 1, text: '面授生'}, {id: 2, text: '网校生'}, {id: 3, text: '寒假网课'}];//下拉列表中的数据项
+            $("#watch-tags").select2({
+                placeholder: "请选择",
+                language: "zh-CN",
+                multiple: true,
+                maximumSelectionLength: 5,
+                data: data.rows,
+            });//启动select2
+            //console.log(data.total);
+        }
+    });
+    //数据回显
+    //$("#watch-tags").val([1,2]).trigger("change");
 });
 
 // 查询
@@ -99,6 +122,7 @@ function createGridStudent() {
 			title : '学生类型',
 			width : '10%',
 			align : 'center',
+            hidden:'true',
             formatter : function(val, rec){
                 if(val == 1){
                     return "面授生+寒假网课";
@@ -125,7 +149,7 @@ function createGridStudent() {
 		}, {
 			field : '_operate',
 			title : '操作',
-			width : '10%',
+			width : '15%',
 			align : 'center',
 			formatter : function(val, rec) {
 				var addrVal = "";
@@ -138,7 +162,7 @@ function createGridStudent() {
 
 				var updateHtml = '<input type="button" class="btn btn-info" style="margin: 5px" ' +
                 'onclick= "initModal(\'' + rec.id + '\',\'' + rec.name + '\',\'' + rec.phoneNumber + '\',\'' + rec.grade +
-					'\',\'' + rec.onType +'\',\'' + addrVal +'\')" value="更新"/>';
+					'\',\'' + rec.watchTags +'\',\'' + addrVal +'\')" value="更新"/>';
 				return delHtml + updateHtml ;
 			}
 		}] ]
@@ -160,16 +184,19 @@ function delStudent(userId){
 	}, 'json');
 }
 
-function initModal(id,name,phoneNumber,grade,onType,address) {
-    console.log(name + phoneNumber + grade+ onType+address);
+function initModal(id,name,phoneNumber,grade,watchTags,address) {
+    console.log( watchTags);
 
     $("#uid").val(id);
     $("#updName").val(name);
     $("#updPhone").val(phoneNumber);
     $("#updGrade").val(grade);
-    $("#onType").val(onType);
 	$("#address").val(address);
 
+	var tags = watchTags.split("#");
+    console.log( tags);
+    //数据回显
+    $("#watch-tags").val(tags).trigger("change");
     $('#myModal').modal('show');          // 初始化后立即调用 show 方法
 };
 
@@ -178,24 +205,32 @@ $('#update').click(function () {
 	var userName = $("#updName").val();
 	var grade = $("#updGrade").val();
 	var phoneNumber = $("#updPhone").val();
-	var onType = $("#onType").val();
+    var tagIds =  $("#watch-tags").val();
 	var address = $("#address").val();
-
-	$.post('updateStudentOrg.jspx', {
-		id : id,
-        userName : userName,
-        grade : grade,
-        phoneNumber : phoneNumber,
-        onType : onType,
-        address : address
-	}, function(data) {
-		if (data.result == "success") {
-            createGridStudent();
-            $('#myModal').modal('hide');
-			//alert("更新成功");
-		}else{
-			alert("更新失败")
-		}
-	}, 'json');
+		console.log(tagIds);
+    $.ajax({
+        type: 'post',
+        url: 'updateStudentOrg.jspx',
+        data: {
+            id : id,
+            userName : userName,
+            grade : grade,
+            phoneNumber : phoneNumber,
+            tagIds : tagIds,
+            address : address
+        },
+        cache: false,
+        dataType: 'json',
+        traditional: true,
+        success: function (data) {
+            if (data.result == "success") {
+                createGridStudent();
+                $('#myModal').modal('hide');
+                //alert("更新成功");
+            }else{
+                alert("更新失败")
+            };
+        }
+    });
 });
 

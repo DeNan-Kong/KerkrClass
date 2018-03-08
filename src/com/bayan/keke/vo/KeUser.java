@@ -109,6 +109,8 @@ public class KeUser implements java.io.Serializable {
 	private Integer onType;
 
 	private String address;
+	//观看标签
+	private String watchTags;
 
 	/** default constructor */
 	public KeUser() {
@@ -453,5 +455,13 @@ public class KeUser implements java.io.Serializable {
 
 	public void setAddress(String address) {
 		this.address = address;
+	}
+
+	public String getWatchTags() {
+		return watchTags;
+	}
+
+	public void setWatchTags(String watchTags) {
+		this.watchTags = watchTags;
 	}
 }

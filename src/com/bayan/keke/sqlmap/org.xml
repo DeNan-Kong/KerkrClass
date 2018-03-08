@@ -32,7 +32,9 @@
     <update id="updateStuInfo" parameterType="org">
         UPDATE ke_user
         SET org_id = #{orgId},
-        on_type=#{onType},
+        <if test="watchTags != null">
+            watch_tags = #{watchTags},
+        </if>
         <if test="type != null">
             type = #{type},
         </if>
@@ -57,7 +59,7 @@
         SET user_name = #{userName},
         grade = #{grade},
         phone_number = #{phoneNumber},
-        on_type = #{onType},
+        watch_tags = #{watchTags},
         address = #{address},
         update_time = now()
         WHERE id = #{id}
@@ -130,7 +132,8 @@
         a.type type,
         a.on_type onType,
         '0' userType,
-        a.address
+        a.address,
+        a.watch_tags watchTags
         FROM ke_user a
         LEFT JOIN ke_city b
         ON a.city_code=b.city_code
@@ -216,13 +219,54 @@
         AND type = #{type}
     </select>
     <!--新申请学生审核-->
-    <update id="checkApplyStu">
+    <update id="checkApplyStu" parameterType="org">
       UPDATE ke_user
       SET
         org_id = #{orgId},
         on_type = #{onType},
         type = #{type},
+        watch_tags = #{watchTags},
         update_time = NOW()
       WHERE id = #{id}
     </update>
+
+    <!--20180302-->
+    <insert id="addWatchTag" parameterType="map" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO ke_watch_tag( tag_name,create_time)
+        VALUES (#{tagName},NOW())
+    </insert>
+
+    <select id="countWatchTag" parameterType="map" resultType="int">
+        SELECT count(1) FROM ke_watch_tag
+    </select>
+
+    <select id="getWatchTagList" resultType="map" parameterType="map">
+        SELECT
+          id,
+          tag_name AS tagName,
+          DATE_FORMAT(create_time, '%Y-%m-%d %H:%i') createTime
+        FROM ke_watch_tag
+        ORDER BY create_time DESC
+        <if test="page != null and size != null">
+            limit #{page},#{size}
+        </if>
+    </select>
+
+    <update id="updateWatchTag" parameterType="map">
+        UPDATE ke_watch_tag
+        SET
+          tag_name = #{tagName},
+          update_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delWatchTag" parameterType="map">
+        DELETE FROM ke_watch_tag
+        WHERE id = #{id}
+    </delete>
+
+    <select id="selectWatchTagForName" parameterType="string" resultType="map">
+        SELECT * FROM ke_watch_tag
+        WHERE tag_name = #{tagName}
+    </select>
 </mapper>

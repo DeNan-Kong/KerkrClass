@@ -13,9 +13,8 @@
     <link rel="stylesheet" href="${ctx}/css/qiniu/highlight.css"/>
     <link href="${ctx}/css/bootstrap.min.css" rel="stylesheet">
     <link href="${ctx}/css/bootstrap-select.css" rel="stylesheet">
-
     <%--select--%>
-    <script type="text/javascript" src="${ctx}/js/bootstrap-select.js"></script>
+    <script type="text/javascript" src="${ctx}/js/bootstrap/bootstrap-select.js"></script>
     <style>
         .k-body {
         }
@@ -52,18 +51,13 @@
             </div>
         </div>
 
-        <div class="form-group" hidden>
-            <label style="text-align: center;width:100px; display:inline-block">观看权限</label>
-            <div class="dropdown" style="width:500px; display:inline-block" >
-                <%--<select id="k-type" name="k-type" class="show-tick form-control ">
-                </select>--%>
-                <label style="font-weight: normal" class="watch-author">
-                <input type="checkbox" name="k-type" value="2">
-                在校生</label>
-                <label style="font-weight: normal;margin-left: 50px" class="watch-author">
-                <input type="checkbox" name="k-type" value="3">
-                网校生</label>               
+        <div class="form-group">
+            <label style="text-align: center;width:100px; display:inline-block" for="watch-tags">标签</label>
+            <div class="dropdown" style="width:500px; display:inline-block">
+                <select id="watch-tags" class="show-tick form-control">
+                </select>
             </div>
+            <span style="display:inline-block;color: red"> Tips : 含有任意一个标签的用户即可观看</span>
         </div>
 
         <input type="hidden" value="${sessionScope.userId}" id="orgId">
@@ -125,7 +119,7 @@
 </script>
 
 <%--upload--%>
-<script type="text/javascript" src="${ctx}/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="${ctx}/js/bootstrap/bootstrap.min.js"></script>
 <script type="text/javascript" src="${ctx}/js/qiniu/plupload/moxie.js"></script>
 <script type="text/javascript" src="${ctx}/js/qiniu/plupload/plupload.dev.js"></script>
 <%--<script src="${ctx}/js/qiniu/plupload/plupload.full.min.js"></script>--%>

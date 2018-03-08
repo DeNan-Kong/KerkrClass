@@ -328,6 +328,7 @@ public class OrgAction extends BaseAction implements
             String orgId = getSession().getAttribute("userId").toString();
             keOrg.setUserId(keOrg.getPhoneNumber());
             keOrg.setOrgId(orgId);
+            keOrg.setType(KeCommon.TYPE_TRY);//正常,后台添加学生不需要审核
 
             KeUser keUser = new KeUser();
             keUser.setPhoneNumber(keOrg.getPhoneNumber());
@@ -345,13 +346,22 @@ public class OrgAction extends BaseAction implements
             keUser.setHeadUrl("kerkr999");
             // 设置设备的用途：0学生,1老师
             keUser.setFlag("0");
-            // 注册用户进来默认为：试用用户(0:试用用户,1:充值用户)
+            // 后台添加学生不需要审核[用户类型(0:正常,1:充值,4:申请中,5:申请未通过)]
             keUser.setType("0");
             if (CheckUtil.isNullOrEmpty(keUser.getDeviceId())) {
                 keUser.setDeviceId("nodeviceid");
                 printErrorLog("取不到deviceId", logger);
             }
-
+            //观看标签持久化
+            String[] tagIds = keOrg.getTagIds();
+            if(tagIds.length >0 && !tagIds[0].isEmpty()){
+                String watchTags="";
+                for(String t:tagIds){
+                    watchTags += t + "#";
+                }
+                keOrg.setWatchTags(watchTags);
+                keUser.setWatchTags(watchTags);
+            }
             // 判断该用户是否已注册
             KeUser reg = userService.regist(keUser);
             if (reg != null) {
@@ -731,32 +741,38 @@ public class OrgAction extends BaseAction implements
         try {
             if (CheckUtil.checkNulls(
                     keOrg.getId(),
-                    keOrg.getType(),
                     getSession().getAttribute("userId").toString()
-            )) {
+            )|| KeCommon.TYPE_APPLY.equals(keOrg.getType()) ) {
                 printDebugLog("传入的参数为空值,请参考参数日志", logger);
                 json.element("result", "fail");
                 print(json);
-            } else {
-                //类型(0:试用,1:充值,2:在校生,3:网校生,4:申请中,5:申请未通过)
-                if( KeCommon.TYPE_NOPASS.equals(keOrg.getType()) ){
-
-                }else {
-                    keOrg.setOnType(Integer.valueOf(keOrg.getType()) );
-                    keOrg.setType("0");
-                    keOrg.setOrgId(getSession().getAttribute("userId").toString());
-                }
-
-                Integer rst = orgService.checkApplyStu(keOrg);
-
-                // 返回结果
-                if (rst > 0) {
-                    json.element("result", "success");
-                } else {
-                    json.element("result", "fail");
-                }
-                print(json);
+                return;
             }
+            //类型(0:试用,1:充值,2:在校生,3:网校生,4:申请中,5:申请未通过)
+            if(KeCommon.TYPE_NOPASS.equals(keOrg.getType())){
+                //审核不通过
+                keOrg.setOrgId(null);
+                keOrg.setWatchTags(null);
+            }else{
+                keOrg.setOrgId(getSession().getAttribute("userId").toString());
+                //观看标签持久化
+                String[] tagIds = keOrg.getTagIds();
+                if(tagIds.length >0 && !tagIds[0].isEmpty()){
+                    String watchTags="";
+                    for(String t:tagIds){
+                        watchTags += t + "#";
+                    }
+                    keOrg.setWatchTags(watchTags);
+                }
+            }
+            Integer rst = orgService.checkApplyStu(keOrg);
+            // 返回结果
+            if (rst > 0) {
+                json.element("result", "success");
+            } else {
+                json.element("result", "fail");
+            }
+            print(json);
             // 请求结束log
             printEndLog("查询学生结束返回值:", json.toString(), logger);
         } catch (Exception e) {
@@ -1030,7 +1046,6 @@ public class OrgAction extends BaseAction implements
     public void updateStudent() {
         printStartLog("方法开始updateStudent", logger);
         printParamsLog("更新学生处理参数:", logger);
-
         if (CheckUtil.isNullOrEmpty(keOrg.getId())) {
             printDebugLog("学生UID为空", logger);
             // 返回结果
@@ -1039,11 +1054,19 @@ public class OrgAction extends BaseAction implements
             print(json);
             return;
         }
-
         try {
+            //观看标签持久化
+            String[] tagIds = keOrg.getTagIds();
+            if(tagIds.length >0 && !tagIds[0].isEmpty()){
+                String watchTags="";
+                for(String t:tagIds){
+                    watchTags += t + "#";
+                }
+                keOrg.setWatchTags(watchTags);
+            }
+            Integer rst = orgService.updateStuById(keOrg);
             // 返回结果
             JSONObject json = new JSONObject();
-            Integer rst = orgService.updateStuById(keOrg);
             if (rst == 1) {
                 json.element("result", "success");
             } else {
@@ -1053,6 +1076,135 @@ public class OrgAction extends BaseAction implements
 
             // 请求结束log
             printEndLog("更新学生结束返回值:", json.toString(), logger);
+        } catch (Exception e) {
+            printSysErr(e, logger);
+        }
+    }
+
+    /**
+     * 标签设置页面 20180305
+     * @return
+     */
+    public String toWatchTag() {
+        return "toWatchTag";
+    }
+
+    /**
+     * 标签列表&设置页面
+     * 20180306
+     */
+    public void watchTagList() {
+        printStartLog("watchTagList方法开始", logger);
+        printParamsLog("查询标签参数:", logger);
+
+        Map map = new HashMap<>();
+        map.put("page", keOrg.getPageNumber());
+        map.put("size", keOrg.getPageSize());
+        try {
+            Integer rst = orgService.countWatchTag(map);
+            List<Map> list = orgService.getWatchTagList(map);
+            // 返回结果
+            JSONArray jsonList = JSONArray.fromObject(list);
+            JSONObject json = new JSONObject();
+            json.element("total", rst);
+            json.element("rows", jsonList.toString());
+            print(json);
+
+            // 请求结束log
+            printEndLog("查询watchTagList结束返回值:", json.toString(), logger);
+        } catch (Exception e) {
+            printSysErr(e, logger);
+        }
+    }
+
+    public void addWatchTag() {
+        printStartLog("addWatchTag方法开始", logger);
+        printParamsLog("addWatchTag参数:", logger);
+
+        Map map = new HashMap<>();
+        map.put("tagName", keOrg.getTagName());
+        try {
+            List<Map> havTag= orgService.selectWatchTagForName(keOrg.getTagName());
+
+            JSONObject json = new JSONObject();
+            if(havTag.size() == 0){
+                Integer result = orgService.addWatchTag(map);
+                if (result > 0) {
+                    json.element("result", "success");
+                    json.element("message", "添加成功");
+                } else {
+                    json.element("result", "fail");
+                    json.element("message", "添加失败");
+                }
+            }else {
+                json.element("result", "fail");
+                json.element("message", "重复标签");
+            }
+            // 返回结果
+            print(json);
+            // 请求结束log
+            printEndLog("addWatchTag结束返回值:", json.toString(), logger);
+        } catch (Exception e) {
+            printSysErr(e, logger);
+        }
+    }
+
+    public void updateWatchTag() {
+        printStartLog("updateWatchTag方法开始", logger);
+        printParamsLog("updateWatchTag参数:", logger);
+
+        Map map = new HashMap<>();
+        map.put("id", keOrg.getId());
+        map.put("tagName", keOrg.getTagName());
+        try {
+            List<Map> havTag= orgService.selectWatchTagForName(keOrg.getTagName());
+            // 返回结果
+            JSONObject json = new JSONObject();
+            if(havTag.size() == 0){
+                Integer result =orgService.updateWatchTag(map);
+                if (result > 0) {
+                    json.element("result", "success");
+                    json.element("message", "修改成功");
+                } else {
+                    json.element("result", "fail");
+                    json.element("message", "修改失败");
+                }
+            }else {
+                json.element("result", "fail");
+                json.element("message", "重复标签");
+            }
+            print(json);
+            // 请求结束log
+            printEndLog("updateWatchTag结束返回值:", json.toString(), logger);
+        } catch (Exception e) {
+            printSysErr(e, logger);
+        }
+    }
+
+    /**
+     * 标签列表&下拉菜单
+     * 20180306
+     */
+    public void getTagsList() {
+        printStartLog("getTagsList方法开始", logger);
+        try {
+            Integer rst = orgService.countWatchTag(null);
+            List<Map> list = orgService.getWatchTagList(null);
+            JSONArray jsonList = new JSONArray();
+            for (Map one:list){
+                Map tmp = new HashMap();
+                tmp.put("id",one.get("id"));
+                tmp.put("text",one.get("tagName"));
+                jsonList.add(tmp);
+            }
+            // 返回结果
+            JSONObject json = new JSONObject();
+            json.element("total", rst);
+            json.element("rows", jsonList.toString());
+            print(json);
+
+            // 请求结束log
+            printEndLog("getTagsList结束返回值:", json.toString(), logger);
         } catch (Exception e) {
             printSysErr(e, logger);
         }

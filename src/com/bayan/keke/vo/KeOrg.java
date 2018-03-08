@@ -1,5 +1,7 @@
 package com.bayan.keke.vo;
 
+import java.util.List;
+
 /**
  * 
  * @author zx
@@ -69,6 +71,20 @@ public class KeOrg implements java.io.Serializable {
 	private Integer onType;
 
 	private String address;
+	/**
+	 * 起始条
+	 */
+	private Integer pageNumber;
+	/**
+	 * 截止条
+	 */
+	private Integer pageSize;
+	//标签名称
+	private String tagName;
+	//观看标签
+	private String[] tagIds;
+	//观看标签
+	private String watchTags;
 
 	/** default constructor */
 	public KeOrg() {
@@ -232,5 +248,45 @@ public class KeOrg implements java.io.Serializable {
 
 	public void setAddress(String address) {
 		this.address = address;
+	}
+
+	public Integer getPageNumber() {
+		return pageNumber;
+	}
+
+	public void setPageNumber(Integer pageNumber) {
+		this.pageNumber = pageNumber;
+	}
+
+	public Integer getPageSize() {
+		return pageSize;
+	}
+
+	public void setPageSize(Integer pageSize) {
+		this.pageSize = pageSize;
+	}
+
+	public String getTagName() {
+		return tagName;
+	}
+
+	public void setTagName(String tagName) {
+		this.tagName = tagName;
+	}
+
+	public String[] getTagIds() {
+		return tagIds;
+	}
+
+	public void setTagIds(String[] tagIds) {
+		this.tagIds = tagIds;
+	}
+
+	public String getWatchTags() {
+		return watchTags;
+	}
+
+	public void setWatchTags(String watchTags) {
+		this.watchTags = watchTags;
 	}
 }

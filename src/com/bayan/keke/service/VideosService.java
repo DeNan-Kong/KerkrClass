@@ -27,7 +27,6 @@ public class VideosService {
 
 	public Boolean saveVideoInfo(KeVideos keVideos) throws Exception{
 		//keVideos = changeValue(keVideos);
-		keVideos.setWatchAuthor("1");
 		int res = videosDao.saveVideoInfo(keVideos);
 		if(res > 0)
 			return true;
@@ -51,7 +50,6 @@ public class VideosService {
 	 */
 	public Boolean updateInfo(KeVideos keVideos) throws Exception{
 		//keVideos = changeValue(keVideos);
-		keVideos.setWatchAuthor("1");
 		int res = videosDao.updateInfo(keVideos);
 		if(res > 0)
 			return true;

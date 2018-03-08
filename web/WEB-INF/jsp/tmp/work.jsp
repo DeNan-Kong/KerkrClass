@@ -138,6 +138,6 @@ label[class ^="btn btn-default"] {
 			</div>
 		</div>
 		<script type="text/javascript"
-			src="${ctx}/js/bootstrap-filestyle.min.js"></script>
+			src="${ctx}/js/bootstrap/bootstrap-filestyle.min.js"></script>
 	</body>
 </html>

@@ -1,5 +1,27 @@
 $(function() {
     createGridVideos();
+    //动态下拉菜单
+    $.ajax({
+        url:'getTagsListOrg.jspx',
+        type:'post', //GET
+        async:true,    //或false,是否异步
+        data: {},
+        timeout:5000,    //超时时间
+        dataType:'json',    //返回的数据格式：json/xml/html/script/jsonp/text
+        success:function(data,textStatus,jqXHR){
+            //var data = [{id: 1, text: '面授生'}, {id: 2, text: '网校生'}, {id: 3, text: '寒假网课'}];//下拉列表中的数据项
+            $("#watch-tags").select2({
+                placeholder: "请选择",
+                language: "zh-CN",
+                multiple: true,
+                maximumSelectionLength: 5,
+                data: data.rows,
+            });//启动select2
+            //console.log(data.total);
+        }
+    });
+    //数据回显
+    //$("#watch-tags").val([1,2]).trigger("change");
 });
 
 function createGridVideos() {
@@ -90,18 +112,13 @@ function createGridVideos() {
             $("#k-grade").val(data.grade);
             $("#k-id").val(data.id);
 
-            //console.log(data.watchAuthor);
-            if(data.watchAuthor == 1){
-                $("[name='k-type']").prop("checked",true);//全选
-            }else if(data.watchAuthor == 2){
-                $("#k-type-2").prop("checked",true);
-                $("#k-type-3").prop("checked",false);
-            }else if(data.watchAuthor == 3){
-                $("#k-type-3").prop("checked",true);
-                $("#k-type-2").prop("checked",false);
-            }else {
-                $("[name='k-type']").prop("checked",false);
+            var tags = [];
+            if( typeof(data.watchAuthor) != "undefined" ){
+                tags = data.watchAuthor.split("#");
             }
+            //console.log( tags);
+            //数据回显
+            $("#watch-tags").val(tags).trigger("change");
 
             //alert(JSON.stringify(data));
             //var row = $('#videos-list').datagrid('getSelected');
@@ -126,41 +143,35 @@ function del(id){
     }, 'json');
 }
 
-//更新
-var checked = new Array();
-$(".watch-author").click(function(){
-    checked = [];
-    $('input[name="k-type"]:checked').each(function(){
-        checked.push($(this).val());
+$('#update').click(function () {
+    var id = $("#k-id").val();
+    var title = $("#title").val();
+    var grade = $("#k-grade").val();
+    var description = $("#description").val();
+    var tagIds =  $("#watch-tags").val();
+    console.log(tagIds);
+    $.ajax({
+        type: 'post',
+        url: 'updateVideos.jspx',
+        data: {
+            id : id,
+            title : title,
+            description : description,
+            grade : grade,
+            tagIds : tagIds,
+        },
+        cache: false,
+        dataType: 'json',
+        traditional: true,
+        success: function (data) {
+            if(data.code == 1000){
+                createGridVideos();
+                alert(data.message)
+            }else {
+                alert(data.message)
+            }
+        }
     });
-    //console.log(checked);
-});
-$("#update").click(
-function update(){
-    //选取表单
-    var form = $("#k-form");
-    //获取表单数据
-    var form_data = getFormData(form);
-    form_data.checkboxValue = checked.toString();
-    console.log(form_data);
-    //发送AJAX请求
-    $.post('updateVideos.jspx',form_data,function(data,status){
-        var result = JSON.parse(data);
-       console.log("Data: " + data + "\nStatus: " + status);
-       if(result.code == 1000){
-           createGridVideos();
-           alert("更新成功");
-       }else {
-           alert(result.message)
-       }
-
-        /*if (d.code ) {
-            createGridVideos();
-            alert("更新成功");
-        }else{
-            alert("更新失败")
-        }*/
-    })
 });
 
 function getFormData(form){

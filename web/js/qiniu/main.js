@@ -2,16 +2,29 @@
 /*global plupload */
 /*global FileProgress */
 /*global hljs */
-var checked = new Array();
-$(".watch-author").click(function(){
-    checked = [];
-    $('input[name="k-type"]:checked').each(function(){
-        checked.push($(this).val());
-    });
-    console.log(checked);
-});
 
 $(function () {
+    //动态下拉菜单
+    $.ajax({
+        url:'getTagsListOrg.jspx',
+        type:'post', //GET
+        async:true,    //或false,是否异步
+        data: {},
+        timeout:5000,    //超时时间
+        dataType:'json',    //返回的数据格式：json/xml/html/script/jsonp/text
+        success:function(data,textStatus,jqXHR){
+            //var data = [{id: 1, text: '面授生'}, {id: 2, text: '网校生'}, {id: 3, text: '寒假网课'}];//下拉列表中的数据项
+            $("#watch-tags").select2({
+                placeholder: "请选择",
+                language: "zh-CN",
+                multiple: true,
+                maximumSelectionLength: 5,
+                data: data.rows,
+            });//启动select2
+            //console.log(data.total);
+        }
+    });
+
     var uploader = Qiniu.uploader({
         disable_statistics_report: true,
         makeLogFunc: 1,
@@ -27,20 +40,6 @@ $(function () {
         max_retries: 6,// 上传失败最大重试次数
         uptoken_url: 'getTokenVideos.jspx',//设置请求qiniu-token的url
         //Ajax请求upToken的Url，**强烈建议设置**（服务端提供）  /
-        /*uptoken_func: function(){
-            var ajax = new XMLHttpRequest();
-            ajax.open('GET', $('#uptoken_url').val(), false);
-            ajax.setRequestHeader("If-Modified-Since", "0");
-            ajax.send();
-            if (ajax.status === 200) {
-                var res = JSON.parse(ajax.responseText);
-                console.log('custom uptoken_func:' + res.uptoken);
-                return res.uptoken;
-            } else {
-                console.log('custom uptoken_func err');
-                return '';
-            }
-        },*/
         //domain: "http://ovhr8lih9.bkt.clouddn.com/",
         domain: $("#domain").val() ,//bucket 域名，下载资源时用到，**必需**
         get_new_uptoken: true, //设置上传文件的时候是否每次都重新获取新的token
@@ -94,6 +93,7 @@ $(function () {
             },
             'FileUploaded': function (up, file, info) {
                 var res = $.parseJSON(info.response);
+                var tagIds =  $("#watch-tags").val();
                 var data = {
                     "orgId":$('#orgId').val(),
                     "title": $('#title').val(),
@@ -103,7 +103,7 @@ $(function () {
                     "hash": res.hash,
                     "fsize": res.fsize,
                     "length": parseInt(res.length),
-                    "checkboxValue": checked.toString()
+                    "tagIds": tagIds,
                 }
                 $.ajax({
                     url:'uploadCallBackVideos.jspx',
@@ -112,6 +112,7 @@ $(function () {
                     data: data,
                     timeout:5000,    //超时时间
                     dataType:'json',    //返回的数据格式：json/xml/html/script/jsonp/text
+                    traditional: true,
                     success:function(data,textStatus,jqXHR){
                         if(data.result){
                             var progress = new FileProgress(file, 'fsUploadProgress');
@@ -194,7 +195,6 @@ $(function () {
             hljs.highlightBlock(e);
         });
     });
-
 
     $('body').on('click', 'table button.btn', function () {
         $(this).parents('tr').next().toggle();
@@ -314,7 +314,6 @@ $(function () {
         newImg.src = newUrl;
         return false;
     });
-
 });
 
 function createUniqueCode(ex_name){

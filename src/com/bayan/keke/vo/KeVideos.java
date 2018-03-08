@@ -68,6 +68,8 @@ public class KeVideos implements java.io.Serializable {
     private String watchAuthor;
     //前端checkbox值
     private String checkboxValue;
+    //观看标签
+    private String[] tagIds;
 
     public Integer getId() {
         return id;
@@ -207,5 +209,13 @@ public class KeVideos implements java.io.Serializable {
 
     public void setCheckboxValue(String checkboxValue) {
         this.checkboxValue = checkboxValue;
+    }
+
+    public String[] getTagIds() {
+        return tagIds;
+    }
+
+    public void setTagIds(String[] tagIds) {
+        this.tagIds = tagIds;
     }
 }

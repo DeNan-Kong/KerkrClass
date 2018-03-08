@@ -220,4 +220,24 @@ public class OrgService {
 	public Integer updateStuById(KeOrg keOrg){
 		return orgDao.updateStuById(keOrg);
 	}
+
+	public Integer countWatchTag(Map map){
+		return orgDao.countWatchTag(map);
+	}
+
+	public List<Map> getWatchTagList(Map map){
+		return orgDao.getWatchTagList(map);
+	}
+
+	public Integer updateWatchTag(Map map){
+		return orgDao.updateWatchTag(map);
+	}
+
+	public Integer addWatchTag(Map map){
+		return orgDao.addWatchTag(map);
+	}
+
+	public List<Map> selectWatchTagForName(String tagName){
+		return orgDao.selectWatchTagForName(tagName);
+	}
 }
